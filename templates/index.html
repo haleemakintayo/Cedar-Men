@@ -1,7 +1,8 @@
+{% load static %}
 <!doctype html>
 <html class="no-js" lang="zxx">
     
-<!-- Mirrored from htmldemo.net/mira/mira/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 30 Jan 2025 21:11:57 GMT -->
+
 <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -15,20 +16,18 @@
         <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
 		
 		<!-- all css here -->
-        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
-        <link rel="stylesheet" href="assets/css/pe-icon-7-stroke.css">
-        <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-        <link rel="stylesheet" href="assets/css/meanmenu.css">
-        <link rel="stylesheet" href="assets/css/shortcodes/shortcode.css">
-        <link rel="stylesheet" href="assets/css/style.css">
-        <link rel="stylesheet" href="assets/css/responsive.css">
-        <script src="assets/js/vendor/modernizr-3.11.7.min.js"></script>
+        <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/owl.carousel.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/pe-icon-7-stroke.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/meanmenu.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/shortcodes/shortcode.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+        <script src="{% static 'assets/js/vendor/modernizr-3.11.7.min.js' %}"></script>
     </head>
     <body>
-        <!--[if lt IE 8]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+        
         <!-- Add your site or application content here -->
         <div class="waraper">
             <header>
@@ -37,7 +36,7 @@
                         <div class="row">
                             <div class="col-lg-3 col-xl-3 col-md-4 col-4">
                                 <div class="logo">
-                                    <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                                    <a href="index.html"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-xl-6 col-md-2 col-2 text-center">
@@ -88,7 +87,7 @@
                                         <ul>
                                             <li>
                                                 <div class="cart-img">
-                                                    <a href="#"><img src="assets/img/cart/1.jpg" alt="" /></a>
+                                                    <a href="#"><img src="{% static 'assets/img/cart/1.jpg' %}" alt="" /></a>
                                                 </div>
                                                 <div class="cart-content">
                                                     <h3><a href="#"> 1 X Faded...</a> </h3>
@@ -101,7 +100,7 @@
                                             </li>
                                             <li>
                                                 <div class="cart-img">
-                                                    <a href="#"><img src="assets/img/cart/2.jpg" alt="" /></a>
+                                                    <a href="#"><img src="{% static 'assets/img/cart/2.jpg' %}" alt="" /></a>
                                                 </div>
                                                 <div class="cart-content">
                                                     <h3><a href="#"> 1 X Faded...</a> </h3>
@@ -175,7 +174,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/1.jpg" alt="" />	
+                                            <img src="{% static 'assets/img/shop/1.jpg' %}" alt="" />	
                                         </a>	
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -192,7 +191,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/2.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/2.jpg' %}" alt="" />
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Beige Tote</a></h3>
@@ -208,7 +207,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/3.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/3.jpg' %}" alt="" />
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -225,7 +224,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/4.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/4.jpg' %}" alt="" />
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Beige Tote</a></h3>
@@ -241,7 +240,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/5.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/5.jpg' %}" alt="" />
                                         </a>	
                                         <div class="shop-title title-style-1">
                                             <h3><a href="#">Classic Gloves</a></h3>
@@ -258,7 +257,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/6.jpg" alt="" />	
+                                            <img src="{% static 'assets/img/shop/6.jpg' %}" alt="" />	
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -274,7 +273,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/7.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/7.jpg' %}" alt="" />
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -291,7 +290,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/8.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/8.jpg' %}" alt="" />
                                         </a>	
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -308,7 +307,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/9.jpg" alt="" />
+                                            <img src="{% static 'assets/img/shop/9.jpg' %}" alt="" />
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -324,7 +323,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/10.jpg" alt="" />	
+                                            <img src="{% static 'assets/img/shop/10.jpg' %}" alt="" />	
                                         </a>	
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -340,7 +339,7 @@
                                 <div class="shop hover-style mb-30">
                                     <div class="shop-img">
                                         <a href="preduct-details.html">
-                                            <img src="assets/img/shop/11.jpg" alt="" />	
+                                            <img src="{% static 'assets/img/shop/11.jpg' %}" alt="" />	
                                         </a>
                                         <div class="shop-title title-style-1">
                                             <h3><a href="preduct-details.html">Classic Gloves</a></h3>
@@ -364,7 +363,7 @@
             <div class="banner-area pb-100">
                 <div class="container-fluid">
                     <div class="banner-img">
-                        <img src="assets/img/banner/1.jpg" alt="">
+                        <img src="{% static 'assets/img/banner/1.jpg' %}" alt="">
                     </div>
                 </div>
             </div>
@@ -380,7 +379,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="single-blog mb-30">
                                 <a href="blog-details.html">
-                                    <img src="assets/img/blog/1.jpg" alt="">
+                                    <img src="{% static 'assets/img/blog/1.jpg' %}" alt="">
                                 </a>
                                 <div class="blog-title">
                                     <span>December 8, 2022</span>
@@ -392,7 +391,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="single-blog mb-30">
                                 <a href="blog-details.html">
-                                    <img src="assets/img/blog/2.jpg" alt="">
+                                    <img src="{% static 'assets/img/blog/2.jpg' %}" alt="">
                                 </a>
                                 <div class="blog-title">
                                     <span>December 8, 2022</span>
@@ -404,7 +403,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="single-blog mb-30">
                                 <a href="blog-details.html">
-                                    <img src="assets/img/blog/5.jpg" alt="">
+                                    <img src="{% static 'assets/img/blog/5.jpg' %}" alt="">
                                 </a>
                                 <div class="blog-title">
                                     <span>December 8, 2022</span>
@@ -416,7 +415,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="single-blog mb-30">
                                 <a href="blog-details.html">
-                                    <img src="assets/img/blog/3.jpg" alt="">
+                                    <img src="{% static 'assets/img/blog/3.jpg' %}" alt="">
                                 </a>
                                 <div class="blog-title">
                                     <span>December 8, 2022</span>
@@ -435,7 +434,7 @@
                     <div class="row">
                         <div class="col-lg-2 col-md-4 col-12 col-sm-12">
                             <div class="footer-logo">
-                                <a href="#"><img src="assets/img/logo/logo.png" alt=""></a>
+                                <a href="#"><img src="{% static 'assets/img/logo/logo.png' %}" alt=""></a>
                                 <p>Lorem ipsum dolor sit amet tempor, consectetur adipisicing.</p>
                                 <ul>
                                     <li><a href="https://www.facebook.com/devitems/?ref=bookmarks"><i class="fa fa-facebook"></i></a></li>
@@ -559,19 +558,19 @@
         
         
 		<!-- all js here -->
-        <script src="assets/js/vendor/jquery-v1.12.4.min.js"></script>
-        <script src="assets/js/popper.js"></script>
-        <script src="assets/js/bootstrap.min.js"></script>
-        <script src="assets/js/jquery.meanmenu.js"></script>
-        <script src="assets/js/isotope.pkgd.min.js"></script>
-        <script src="assets/js/imagesloaded.pkgd.min.js"></script>
-        <script src="assets/js/owl.carousel.min.js"></script>
-        <script src="assets/js/jquery.counterup.min.js"></script>
-        <script src="assets/js/waypoints.min.js"></script>
-        <script src="assets/js/ajax-mail.js"></script>
-        <script src="assets/js/plugins.js"></script>
-        <script src="assets/js/main.js"></script>
+        <script src="{% static 'assets/js/vendor/jquery-v1.12.4.min.js' %}"></script>
+        <script src="{% static 'assets/js/popper.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.meanmenu.js' %}"></script>
+        <script src="{% static 'assets/js/isotope.pkgd.min.js' %}"></script>
+        <script src="{% static 'assets/js/imagesloaded.pkgd.min.js' %}"></script>
+        <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.counterup.min.js' %}"></script>
+        <script src="{% static 'assets/js/waypoints.min.js' %}"></script>
+        <script src="{% static 'assets/js/ajax-mail.js' %}"></script>
+        <script src="{% static 'assets/js/plugins.js' %}"></script>
+        <script src="{% static 'assets/js/main.js' %}"></script>
     </body>
 
-<!-- Mirrored from htmldemo.net/mira/mira/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 30 Jan 2025 21:13:06 GMT -->
+
 </html>
