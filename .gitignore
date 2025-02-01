@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 *.pyc
 *.pyc
+/Cedarmen/__pycache__
+/ecommerce/__pycache__
+/ecommerce/__pycache__

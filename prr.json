@@ -1,0 +1,66 @@
+[
+    {
+        "id": 3,
+        "image": "products/12-.jpg",
+        "name": "White Shirts",
+        "old_price": 250,
+        "price": 200,
+        "product_cart": 1
+    },
+    {
+        "id": 5,
+        "image": "products/Cap.jpg",
+        "name": "Cap",
+        "old_price": 200,
+        "price": 150,
+        "product_cart": 1
+    },
+    {
+        "id": 6,
+        "image": "products/Glasses.jpg",
+        "name": "Glasses",
+        "old_price": 110,
+        "price": 90,
+        "product_cart": 1
+    },
+    {
+        "id": 7,
+        "image": "products/Socks.jpg",
+        "name": "Socks",
+        "old_price": 230,
+        "price": 200,
+        "product_cart": 1
+    },
+    {
+        "id": 8,
+        "image": "products/Bag.jpg",
+        "name": "Bag",
+        "old_price": 430,
+        "price": 400,
+        "product_cart": 1
+    },
+    {
+        "id": 9,
+        "image": "products/Timberland.jpg",
+        "name": "Timberland",
+        "old_price": 600,
+        "price": 500,
+        "product_cart": 1
+    },
+    {
+        "id": 10,
+        "image": "products/Belt.jpg",
+        "name": "Belt",
+        "old_price": 280,
+        "price": 170,
+        "product_cart": 1
+    },
+    {
+        "id": 11,
+        "image": "products/Hat.jpg",
+        "name": "Hat",
+        "old_price": 450,
+        "price": 390,
+        "product_cart": 1
+    }
+]
