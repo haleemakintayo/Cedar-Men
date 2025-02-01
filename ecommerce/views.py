@@ -22,8 +22,9 @@ def about_us(request):
 
 
 def shop(request):
+    products = Product.objects.all()
     
-    return render(request, 'shop.html')
+    return render(request, 'shop.html',{'products': products})
 
 def product_details(request, slug):
     product = get_object_or_404(Product, slug=slug)

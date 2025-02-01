@@ -25,7 +25,7 @@
                                                 <img src="{{ product.image.url }}" alt="{{ product.name }}" />
                                             </a>    
                                             <div class="shop-title title-style-1">
-                                                <h3><a href="#">{{ product.name }}</a></h3>
+                                                <h3><a href="{{ product.get_url }}">{{ product.name }}</a></h3>
                                                 <span class="new-price">${{ product.price }}</span>
                                                 <span class="old-price">${{ product.old_price }}</span>
                                             </div>
