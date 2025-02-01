@@ -3,7 +3,12 @@ from django.contrib import admin
 # Register your models here.
 
 from django.contrib import admin
-from .models import Product
+from .models import(
+    Product,Color,
+    Blog, TeamMember,
+    Size,Category 
+
+                    )
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -12,9 +17,9 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('product_cart',)
 
 
-
-from .models import Blog, TeamMember
-
+admin.site.register(Color)
+admin.site.register(Size)
+admin.site.register(Category)
 # Register the Blog model with the admin site
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):

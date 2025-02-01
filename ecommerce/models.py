@@ -6,8 +6,8 @@ from django.shortcuts import reverse
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    # slug = models.SlugField(max_length=255, unique=True)
-    image = models.ImageField(upload_to='category/')
+    slug = models.SlugField(max_length=255, unique=True)
+    image = models.ImageField(upload_to='category/', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     icon_class = models.CharField(max_length=100, blank=True, null=True) 
 
