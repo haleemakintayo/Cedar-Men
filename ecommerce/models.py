@@ -55,10 +55,13 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/')
     product_cart = models.BooleanField(default=False)
     sizes = models.ManyToManyField(Size, blank=True)
-
+    description = models.TextField(blank=True, null=True)
+    more_info = models.TextField(blank=True, null=True)
+    composition = models.CharField(max_length=255, blank=True, null=True)
+    style = models.CharField(max_length=255, blank=True, null=True)
+    properties = models.CharField(max_length=255, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Only set the slug if it hasn't been set yet.
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
@@ -74,6 +77,18 @@ class Product(models.Model):
             'slug': self.slug
         })
     
+
+
+ #Im waiting for the auth to finish before implementing it   
+# class Review(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     comment = models.TextField()
+#     rating = models.PositiveIntegerField(default=5)
+#     created_at = models.DateTimeField(auto_now_add=True)
+    
+#     def __str__(self):
+#         return f"Review by {self.user.username} on {self.product.name}"    
 
 
  

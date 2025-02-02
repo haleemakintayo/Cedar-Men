@@ -1,22 +1,15 @@
 from django.urls import path,include
-# from .views import home
 
 
-
-# urlpatterns = [
-#     path('', home, name='home'),
-    
-   
-   
-# ]
-
-
-from django.urls import path
 
 from .views import (
     home, shop, blog_list,
     about_us, contact_us,blog_details,
+
     product_details,contact_us,
+
+    product_details,checkout
+
 
     )
 
@@ -28,7 +21,12 @@ urlpatterns = [
     path('blog/', blog_list, name='blog'),  # Listing of all blogs
     path('blog/<int:id>/', blog_details, name='blog_details'),  
     path('product/<slug:slug>/', product_details, name='product_detail'),
+
     path('contact_us/', contact_us, name='contact_us'),
+
+    path('cart/', include('cart.urls')),
+    path('ecommerce/checkout/', checkout, name='checkout'),
+
 ]
 
 
