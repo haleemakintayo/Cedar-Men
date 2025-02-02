@@ -10,11 +10,14 @@
                     <div class="row">
                         <div class="col-xl-7 col-lg-7 col-md-12 text-center">
                             <div class="contact-from gray-bg">
-                                <form id="contact-form" action="https://htmldemo.net/mira/mira/mail.php" method="post">
-                                    <input name="name" type="text" placeholder="Name">
-                                    <input name="email" type="email" placeholder="Email">
-                                    <textarea name="message" placeholder="Your message"></textarea>
-                                    <button class="submit" type="submit">Send Massage</button>
+                                <form id="contact-form" action="{% url 'contact_us' %}" method="post">
+                                    {% csrf_token %}
+                                    
+                                    <input name="name" type="text" placeholder="Name" value="{{ form.name.value|default:'' }}" required>
+                                    <input name="email" type="email" placeholder="Email" value="{{ form.email.value|default:'' }}" required>
+                                    <textarea name="message" placeholder="Your message" required>{{ form.message.value|default:'' }}</textarea>
+                                    
+                                    <button class="submit" type="submit">Send Message</button>
                                 </form>
                                 <p class="form-messege"></p>
                             </div>
@@ -27,7 +30,7 @@
                                     </div>
                                     <div class="communication-text">
                                         <h3>Address:</h3>
-                                        <p>Miata 309 S Main St,Stafford, KS 67578</p>
+                                        <p>116 dragon Road, Hatfield. AL109NX</p>
                                     </div>
                                 </div>
                                 <div class="single-communication">
@@ -36,7 +39,7 @@
                                     </div>
                                     <div class="communication-text">
                                         <h3>Phone:</h3>
-                                        <p>0123 456 789   -   15 2368 4597</p>
+                                        <p>07506376664</p>
                                     </div>
                                 </div>
                                 <div class="single-communication">
@@ -64,10 +67,33 @@
             </div>
             <div class="contact-map pb-100">
                 <div id="hastech">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.838709675939!2d144.95320007668528!3d-37.817246734238516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d4dd5a05d97%3A0x3e64f855a564844d!2s121%20King%20St%2C%20Melbourne%20VIC%203000%2C%20Australia!5e0!3m2!1sen!2sus!4v1670477011653!5m2!1sen!2sus" style="border:0;width:100%;height:100%;" allowfullscreen="" loading="lazy"></iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d488792.8587075283!2d-3.276575!3d55.378051!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761cbf1b1f9b3b%3A0x9e7b1b1b1b1b1b1b!2sUnited%20Kingdom!5e0!3m2!1sen!2sus!4v1670477011653!5m2!1sen!2sus" style="border:0;width:100%;height:100%;" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
             <!-- contact-area end -->
+
+
+            <script>
+                document.getElementById("contact-form").addEventListener("submit", function(event) {
+                    event.preventDefault();  // Prevent default form submission
+                
+                    let formData = new FormData(this);
+                    
+                    fetch("{% url 'contact_us' %}", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector(".form-messege").innerText = data.message || data.error;
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
+                </script>
+                
 
             {% endblock %}
             

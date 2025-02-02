@@ -1,9 +1,14 @@
 
 from django.shortcuts import render,redirect,get_object_or_404
+from .forms import ContactForm
 from .models import (
     Product, Blog,TeamMember,
     
     ) 
+
+from django.core.mail import send_mail
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
     # Get all products
@@ -50,6 +55,31 @@ def blog_details(request, id):
 
 def contact_us(request):
     return render(request, 'contact-us.html')
+
+
+
+
+# def contact_us(request):
+#     if request.method == "POST":
+#         form = ContactForm(request.POST)
+#         if form.is_valid():
+#             name = form.cleaned_data["name"]
+#             email = form.cleaned_data["email"]
+#             message = form.cleaned_data["message"]
+
+#             # Send an email
+#             send_mail(
+#                 subject=f"New Message from {name}",
+#                 message=message,
+#                 from_email=email,
+#                 recipient_list=["TheCedarBrand@outlook.com"],  # Change to your email
+#             )
+
+#             return redirect("contact_us")  # Redirect after successful form submission
+#     else:
+#         form = ContactForm()
+
+#     return render(request, "contact-us.html", {"form": form})
 
 
 

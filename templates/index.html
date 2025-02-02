@@ -17,7 +17,7 @@
                 <div class="container-fluid">		
                     <div class="shop-style-all">
                         <div class="grid row">
-                            {% for product in products %}
+                            {% for product in products|slice:":4" %}
                                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 grid-item cat1">
                                     <div class="shop hover-style mb-30">
                                         <div class="shop-img">
@@ -39,10 +39,11 @@
                         </div>
                     </div>
                     <div class="view-more text-center mt-30">
-                        <a href="shop.html">view more</a>
+                        <a href="{% url 'shop' %}">view more</a>
                     </div>
                 </div>
-            </div>			
+            </div>
+                        
             <!-- shop area end -->
             <!-- banner area start -->
             <div class="banner-area pb-100">
