@@ -79,14 +79,14 @@
                         <ul>
                           <li><a href="{% url 'about_us' %}">about us</a></li>
                           <li><a href="shop.html">shop</a></li>
-                          <li><a href="cart.html">cart</a></li>
+                          <li><a href="{% url 'cart_summary' %}">cart</a></li>
                           <li>
                             <a href="{% url 'login' %}">login</a>
                           </li>
                           <li>
                             <a href="{% url 'register' %}">register</a>
                           </li>
-                          <li><a href="checkout.html">checkout</a></li>
+                          <li><a href="{% url 'cart_summary' %}">checkout</a></li>
                           <li><a href="wishlist.html">wishlist</a></li>
                           <li>
                             <a href="preduct-details.html">shop details</a>
@@ -118,54 +118,28 @@
                 class="col-lg-3 col-xl-3 col-md-6 col-6 text-right text-sm text-res"
               >
                 <div class="cart-user-language">
+                  
                   <div class="shopping-cart ml-30">
-                    <a class="top-cart" href="cart.html"
-                      ><i class="pe-7s-cart"></i
-                    ></a>
+                    <a class="top-cart" href="{% url 'cart_summary' %}">
+                      <i class="pe-7s-cart"></i>
+                    </a>
+                    {% for item in cart.items.all %}
                     <ul>
                       <li>
                         <div class="cart-img">
                           <a href="#"
                             ><img
-                              src="{% static 'assets/img/cart/1.jpg' %}"
+                              src="{{ item.product.image.url }}"
                               alt=""
                           /></a>
                         </div>
                         <div class="cart-content">
                           <h3><a href="#"> 1 X Faded...</a></h3>
-                          <span><b>S, Orange</b></span>
-                          <span class="cart-price">£ 16.84</span>
+                          <span><b>{{ item.size.label }}, {{ item.color.name }}</b></span>
+                          <span class="cart-price">£ {{ item.product.price }}</span>
                         </div>
                         <div class="cart-del">
                           <i class="pe-7s-close-circle"></i>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="cart-img">
-                          <a href="#"
-                            ><img
-                              src="{% static 'assets/img/cart/2.jpg' %}"
-                              alt=""
-                          /></a>
-                        </div>
-                        <div class="cart-content">
-                          <h3><a href="#"> 1 X Faded...</a></h3>
-                          <span><b>S, Orange</b></span>
-                          <span class="cart-price">£ 16.84</span>
-                        </div>
-                        <div class="cart-del">
-                          <i class="pe-7s-close-circle"></i>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="shipping">
-                          <span class="f-left">Shipping </span>
-                          <span class="f-right cart-price"> $7.00</span>
-                        </div>
-                        <hr class="shipping-border" />
-                        <div class="shipping">
-                          <span class="f-left"> Total </span>
-                          <span class="f-right cart-price">$692.00</span>
                         </div>
                       </li>
                       <li class="checkout m-0">
@@ -174,7 +148,9 @@
                         ></a>
                       </li>
                     </ul>
+                    {% endfor %}
                   </div>
+                  
                   {% if user.is_authenticated %}
                   <div class="user">
                     <a href="{% url 'logout' %}"><i class="pe-7s-power"></i></a>
@@ -213,7 +189,9 @@
           </div>
         </div>
       </header>
-      {% block content %} {% endblock %}
+      {% block content %}
+
+      {% endblock %}
 
       <footer class="footer-area">
         <div class="container-fluid">
@@ -290,7 +268,7 @@
                       <ul>
                         <li><a href="login.html">Login</a></li>
                         <li><a href="wishlist.html">Wishlist</a></li>
-                        <li><a href="cart.html">My Cart</a></li>
+                        <li><a href="{% url 'cart_summary' %}">My Cart</a></li>
                         <li><a href="checkout.html">Checkout</a></li>
                       </ul>
                     </div>

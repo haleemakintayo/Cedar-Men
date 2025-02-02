@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-            <!-- breadcrumb start -->
-            <div class="breadcrumb-area">
-                <div class="container-fluid text-center">
-                    <div class="breadcrumb-stye gray-bg ptb-100">
-                        <h2 class="page-title">product details</h2>
-                        <ul>
-                            <li><a href="{% url 'home' %}">home</a></li>
-                            <li class="active">{{ product.name }}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- breadcrumb end -->
-            <!-- page section start -->
-            {% load static %}
+<!-- breadcrumb start -->
+<div class="breadcrumb-area">
+    <div class="container-fluid text-center">
+        <div class="breadcrumb-stye gray-bg ptb-100">
+            <h2 class="page-title">product details</h2>
+            <ul>
+                <li><a href="{% url 'home' %}">home</a></li>
+                <li class="active">{{ product.name }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb end -->
+
+<!-- page section start -->
 <div class="page-section section ptb-100">
     <div class="container-fluid">
         <div class="row mb-40">
@@ -23,11 +23,11 @@
             <div class="col-xl-5 col-md-6 col-12 mb-40">
                 <!-- Tab panes -->
                 <div class="tab-content product-details-large mb-10">
-                    <!-- Here we display the main product image -->
+                    <!-- Main product image -->
                     <div class="pro-large-img tab-pane active" id="pro-large-img-1">
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" />
                     </div>
-                    
+                    {# Additional thumbnails can be added here if available #}
                 </div>
                 <!-- QuickView Product Thumbnail Slider -->
                 <div class="pro-thumb-img-slider nav">
@@ -36,7 +36,6 @@
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" />
                         </a>
                     </div>
-                    {# Additional thumbnails  #}
                 </div>
             </div>
             <!-- QuickView Product Details -->
@@ -51,9 +50,9 @@
                             <span class="new">€ {{ product.price }}</span>
                         </span>
                         {% if product.old_price %}
-                            <span class="old-price float-left ml-2">€ {{ product.old_price }}</span>
+                        <span class="old-price float-left ml-2">€ {{ product.old_price }}</span>
                         {% endif %}
-                        <!-- Rating (this is hard-coded; you can replace it with dynamic values if available) -->
+                        <!-- Rating (hard-coded for now) -->
                         <span class="ratting float-right">
                             <i class="fa fa-star active"></i>
                             <i class="fa fa-star active"></i>
@@ -70,7 +69,7 @@
                             {% if product.description %}
                                 {{ product.description }}
                             {% else %}
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius, perspiciatis dol
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius, perspiciatis dol...
                             {% endif %}
                         </p>
                     </div>
@@ -79,7 +78,7 @@
                         <h5 class="pd-sub-title">Select Size</h5>
                         {% if product.sizes.all %}
                             {% for size in product.sizes.all %}
-                                <button {% if forloop.first %}class="active"{% endif %}>
+                                <button type="button" class="size-btn" data-size-id="{{ size.id }}" {% if forloop.first %}class="active"{% endif %}>
                                     {{ size.label }}
                                 </button>
                             {% endfor %}
@@ -92,7 +91,9 @@
                         <h5 class="pd-sub-title">Select Color</h5>
                         {% if product.colors.all %}
                             {% for color in product.colors.all %}
-                                <button style="background-color: {{ color.hex_code }};" {% if forloop.first %}class="active"{% endif %}>
+                                <button type="button" class="color-btn border border-dark {% if forloop.first %}active{% endif %}"
+                                    data-color-id="{{ color.id }}"
+                                    style="background-color: {% if color.hex_code|slice:":1" != "#" %}#{{ color.hex_code }}{% else %}{{ color.hex_code }}{% endif %};">
                                     <i class="fa fa-check"></i>
                                 </button>
                             {% endfor %}
@@ -100,12 +101,19 @@
                             <p>No colors available.</p>
                         {% endif %}
                     </div>
+                    
                     <!-- Quantity & Cart -->
                     <div class="quantity-cart section">
-                        <div class="product-quantity2">
-                            <input type="number" value="1" min="1">
-                        </div>
-                        <button class="add-to-cart">add to cart</button>
+                        <form action="{% url 'add_to_cart' product.slug %}" method="post" id="add-to-cart-form">
+                            {% csrf_token %}
+                            <div class="product-quantity2">
+                                <input type="number" name="quantity" value="1" min="1">
+                            </div>
+                            <!-- Hidden inputs for selected color and size -->
+                            <input type="hidden" name="color" id="selected-color" value="">
+                            <input type="hidden" name="size" id="selected-size" value="">
+                            <button type="submit" class="add-to-cart">add to cart</button>
+                        </form>
                     </div>
                     <!-- Useful Links -->
                     <ul class="usefull-link section">
@@ -124,8 +132,8 @@
                 </div>
             </div>
         </div>
+        <!-- Product Info Tabs -->
         <div class="row">
-            <!-- Nav tabs -->
             <div class="col-12">
                 <ul class="pro-info-tab-list section nav">
                     <li><a class="active" href="#more-info" data-bs-toggle="tab">More info</a></li>
@@ -133,7 +141,6 @@
                     <li><a href="#reviews" data-bs-toggle="tab">Reviews</a></li>
                 </ul>
             </div>
-            <!-- Tab panes -->
             <div class="tab-content col-12">
                 <div class="pro-info-tab tab-pane active" id="more-info">
                     <p>
@@ -163,37 +170,60 @@
                     </table>
                 </div>
                 <div class="pro-info-tab tab-pane" id="reviews">
-                        <a href="#">Be the first to write your review!</a>
+                    <a href="#">Be the first to write your review!</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- page section end -->
+
+<!-- jQuery for AJAX functionality -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle color selection
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle color selection: update active class and hidden input.
         const colorButtons = document.querySelectorAll('.color-list button');
-        colorButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                // Remove 'active' class from all color buttons
-                colorButtons.forEach(btn => btn.classList.remove('active'));
-                // Add 'active' class to the clicked button
-                this.classList.add('active');
-            });
-        });
-    
-        // Handle size selection
-        const sizeButtons = document.querySelectorAll('.product-size button');
-        sizeButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                // Remove 'active' class from all size buttons
-                sizeButtons.forEach(btn => btn.classList.remove('active'));
-                // Add 'active' class to the clicked button
-                this.classList.add('active');
-            });
+    const selectedColorInput = document.getElementById('selected-color');
+    colorButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            colorButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            selectedColorInput.value = this.getAttribute('data-color-id');
         });
     });
-    </script>
-    
+
+    // Handle size selection: update active class and hidden input.
+    const sizeButtons = document.querySelectorAll('.product-size button');
+    const selectedSizeInput = document.getElementById('selected-size');
+    sizeButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            sizeButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            selectedSizeInput.value = this.getAttribute('data-size-id');
+        });
+    });
+
+    // AJAX submission for the Add-to-Cart form.
+    $('#add-to-cart-form').on('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission.
+        var formData = $(this).serialize(); // Serialize all form data.
+        $.ajax({
+            url: $(this).attr('action'),
+            method: "POST",
+            data: formData,
+            success: function(response) {
+                // For example, update a mini-cart count or show a success message.
+                alert("Item added to cart! Total items: " + response.total_items);
+                // Optionally update a cart summary element:
+                $('.cart-count').text(response.total_items);
+                $('.cart-total').text("€" + parseFloat(response.total_price).toFixed(2));
+            },
+            error: function(xhr) {
+                alert("Error adding item to cart: " + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
