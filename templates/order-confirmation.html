@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="order-confirmation-area ptb-100">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-area">
+            <div class="container-fluid text-center">
+                <div class="breadcrumb-stye gray-bg ptb-100">
+                    <h2 class="page-title">Order Confirmation</h2>
+                    <ul>
+                        <li><a href="{% url 'home' %}">home</a></li>
+                        <li><a href="{% url 'shop' %}">shop</a></li>
+                        <li class="active">order confirmation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Order Confirmation Content -->
+        <h1>Thank you for your order!</h1>
+        <p>Your order number is <strong>{{ order.id }}</strong>.</p>
+        <p>A confirmation email has been sent to <strong>{{ order.email }}</strong>.</p>
+        <h2>Order Details</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Options</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>
+                        {% if item.size %}
+                            Size: {{ item.size.label }}
+                        {% endif %}
+                        {% if item.color %}
+                            {% if item.size %}<br>{% endif %}
+                            Color: <span style="background-color: {% if item.color.hex_code|slice:":1" != "#" %}#{{ item.color.hex_code }}{% else %}{{ item.color.hex_code }}{% endif %}; display:inline-block; width:15px; height:15px;"></span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>€{{ item.price|floatformat:2 }}</td>
+                    <td>€{{ item.subtotal|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4">Total</th>
+                    <th>€{{ order.total|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+        <a href="{% url 'home' %}" class="btn btn-dark">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}
