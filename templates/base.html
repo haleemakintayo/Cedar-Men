@@ -14,7 +14,7 @@
     <link
       rel="shortcut icon"
       type="image/x-icon"
-      href="assets/img/favicon.ico"
+      href="{% static 'assets/img/favicon-32x32.png' %}"
     />
 
     <!-- all css here -->
@@ -78,7 +78,7 @@
                         <a href="#">pages <i class="pe-7s-angle-down"></i></a>
                         <ul>
                           <li><a href="{% url 'about_us' %}">about us</a></li>
-                          <li><a href="shop.html">shop</a></li>
+                          <li><a href="{% url 'shop' %}">shop</a></li>
                           <li><a href="{% url 'cart_summary' %}">cart</a></li>
                           <li>
                             <a href="{% url 'login' %}">login</a>
@@ -86,8 +86,8 @@
                           <li>
                             <a href="{% url 'register' %}">register</a>
                           </li>
-                          <li><a href="{% url 'cart_summary' %}">checkout</a></li>
-                          <li><a href="wishlist.html">wishlist</a></li>
+                          <li><a href="{% url 'checkout' %}">checkout</a></li>
+                          <li><a href="{% url 'wishlist' %}">wishlist</a></li>
                           <li>
                             <a href="preduct-details.html">shop details</a>
                           </li>
@@ -102,11 +102,11 @@
                           >BLOG <i class="pe-7s-angle-down"></i
                         ></a>
                         <ul>
-                          <li><a href="blog.html">blog 2 column</a></li>
+                          <li><a href="{% url 'blog' %}">blog 2 column</a></li>
                           <li>
                             <a href="blog-style-2.html">blog full wide</a>
                           </li>
-                          <li><a href="blog-details.html">blog details</a></li>
+                          <li><a href="{% url 'blog_details' id=1 %}">blog details</a></li>
                         </ul>
                       </li>
                       <li><a href="{% url 'contact_us' %}">CONTACT</a></li>
@@ -240,10 +240,10 @@
                     <h3>categories</h3>
                     <div class="footer-menu">
                       <ul>
-                        <li><a href="shop.html"> Clothing</a></li>
-                        <li><a href="shop.html"> Shoes</a></li>
-                        <li><a href="shop.html">Watches</a></li>
-                        <li><a href="shop.html">Jewelry</a></li>
+                        <li><a href="{% url 'shop' %}"> Clothing</a></li>
+                        <li><a href="{% url 'shop' %}"> Shoes</a></li>
+                        <li><a href="{% url 'shop' %}">Watches</a></li>
+                        <li><a href="{% url 'shop' %}">Jewelry</a></li>
                       </ul>
                     </div>
                   </div>
@@ -266,10 +266,10 @@
                     <h3>Quick Links</h3>
                     <div class="footer-menu">
                       <ul>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="wishlist.html">Wishlist</a></li>
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'wishlist' %}">Wishlist</a></li>
                         <li><a href="{% url 'cart_summary' %}">My Cart</a></li>
-                        <li><a href="checkout.html">Checkout</a></li>
+                        <li><a href="{% url 'checkout' %}">Checkout</a></li>
                       </ul>
                     </div>
                   </div>

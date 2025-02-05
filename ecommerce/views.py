@@ -45,7 +45,7 @@ def product_details(request, slug):
     return render(request, 'product-details.html', context)
 
 @login_required(login_url='login')
-def blog_list(request):
+def blog(request):
     return render(request, 'blog.html')
 
 @login_required(login_url='login')
@@ -53,10 +53,13 @@ def checkout(request):
     return render(request, 'checkout.html')
 
 
+def wishlist(request):
+    return render(request, 'wishlist.html')
+
 
 def blog_details(request, id):
     blog = Blog.objects.get(id=id)
-    return render(request, 'blog_details.html', {'blog': blog})
+    return render(request, 'blog-details.html', {'blog': blog})
 
 def contact_us(request):
     return render(request, 'contact-us.html')
