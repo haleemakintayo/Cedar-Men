@@ -12,7 +12,7 @@
             <h2 class="page-title">blog</h2>
             <ul>
                 <li><a href="{% url 'home' %}">home</a></li>
-                <li class="active">blog full wide</li>
+                <li class="active">blog details</li>
             </ul>
         </div>
     </div>
@@ -22,65 +22,30 @@
             <div class="blog-page-area pt-100 pb-60">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="single-blog-page mb-40 text-center">
-                                <a href="blog-details.html">
-                                    <img src="{% static 'assets/img/blog/9.jpg' %}" alt="">
-                                </a>
-                                <div class="blog-page-title">
-                                    <span>December 8, 2022</span>
-                                    <h3>
-                                        <a href="blog-details.html">Lorem Ipsum is simply dummy</a>
-                                    </h3>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non laoreet dui. Morbi lacus massa, euismod ut turpis molestie, tristique sodales est. Integer sit amet mi id sapien tempor molestie in nec massa.</p>
+                        {% for blog in blogs %}
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="single-blog-page mb-40 text-center">
+                                    <a href="{% url 'blog_details' blog.id %}">
+                                        <img src="{{ blog.image.url }}" alt="{{ blog.title }}">
+                                    </a>
+                                    <div class="blog-page-title">
+                                        <span>{{ blog.publish_date|date:"F d, Y" }}</span>  <!-- Format date -->
+                                        <h3>
+                                            <a href="{% url 'blog_details' blog.id %}">{{ blog.title }}</a>
+                                        </h3>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="single-blog-page mb-40 text-center">
-                                <a href="blog-details.html">
-                                    <img src="{% static 'assets/img/blog/10.jpg' %}" alt="">
-                                </a>
-                                <div class="blog-page-title">
-                                    <span>December 8, 2022</span>
-                                    <h3>
-                                        <a href="blog-details.html">Lorem Ipsum is simply dummy</a>
-                                    </h3>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non laoreet dui. Morbi lacus massa, euismod ut turpis molestie, tristique sodales est. Integer sit amet mi id sapien tempor molestie in nec massa.</p>
-                                </div>
+                        {% empty %}
+                            <div class="col-12 text-center">
+                                <p>No blogs available.</p>
                             </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="single-blog-page mb-40 text-center">
-                                <a href="blog-details.html">
-                                    <img src="{% static 'assets/img/blog/11.jpg' %}" alt="">
-                                </a>
-                                <div class="blog-page-title">
-                                    <span>December 8, 2022</span>
-                                    <h3>
-                                        <a href="blog-details.html">Lorem Ipsum is simply dummy</a>
-                                    </h3>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non laoreet dui. Morbi lacus massa, euismod ut turpis molestie, tristique sodales est. Integer sit amet mi id sapien tempor molestie in nec massa.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="single-blog-page mb-40 text-center">
-                                <a href="blog-details.html">
-                                    <img src="{% static 'assets/img/blog/12.jpg' %}" alt="">
-                                </a>
-                                <div class="blog-page-title">
-                                    <span>December 8, 2022</span>
-                                    <h3>
-                                        <a href="blog-details.html">Lorem Ipsum is simply dummy</a>
-                                    </h3>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non laoreet dui. Morbi lacus massa, euismod ut turpis molestie, tristique sodales est. Integer sit amet mi id sapien tempor molestie in nec massa.</p>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
+            
+            
             <!-- blog-area end -->
             {% endblock %}
             

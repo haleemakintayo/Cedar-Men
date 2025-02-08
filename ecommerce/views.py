@@ -46,7 +46,8 @@ def product_details(request, slug):
 
 @login_required(login_url='login')
 def blog(request):
-    return render(request, 'blog.html')
+    blogs = Blog.objects.all()  # Fetch all blog posts
+    return render(request, 'blog.html', {'blogs': blogs})
 
 @login_required(login_url='login')
 def checkout(request):

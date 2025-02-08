@@ -17,12 +17,17 @@
       href="{% static 'assets/img/favicon-32x32.png' %}"
     />
 
+    
+
     <!-- all css here -->
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
     <link
       rel="stylesheet"
       href="{% static 'assets/css/owl.carousel.min.css' %}"
     />
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <link
       rel="stylesheet"
       href="{% static 'assets/css/pe-icon-7-stroke.css' %}"
@@ -87,9 +92,9 @@
                             <a href="{% url 'register' %}">register</a>
                           </li>
                           <li><a href="{% url 'checkout' %}">checkout</a></li>
-                          <li><a href="{% url 'wishlist' %}">wishlist</a></li>
+                          <li><a href="wishlist.html">wishlist</a></li>
                           <li>
-                            <a href="preduct-details.html">shop details</a>
+                            <a href="product-details.html">shop details</a>
                           </li>
                           <li>
                             <a href="{% url 'contact_us' %}">contact us</a>
@@ -98,15 +103,15 @@
                       </li>
                       <li><a href="{% url 'shop' %}">shop</a></li>
                       <li>
-                        <a href="blog.html"
+                        <a href="{% url 'blog' %}"
                           >BLOG <i class="pe-7s-angle-down"></i
                         ></a>
                         <ul>
-                          <li><a href="{% url 'blog' %}">blog 2 column</a></li>
+                          <li><a href="{% url 'blog' %}">blog details</a></li>
                           <li>
-                            <a href="blog-style-2.html">blog full wide</a>
+                            <!-- <a href="blog-style-2.html">blog full wide</a> -->
                           </li>
-                          <li><a href="{% url 'blog_details' id=1 %}">blog details</a></li>
+                          <li><a href="{% url 'blog_details' id=1 %}">blog</a></li>
                         </ul>
                       </li>
                       <li><a href="{% url 'contact_us' %}">CONTACT</a></li>
@@ -409,5 +414,8 @@
     <script src="{% static 'assets/js/ajax-mail.js' %}"></script>
     <script src="{% static 'assets/js/plugins.js' %}"></script>
     <script src="{% static 'assets/js/main.js' %}"></script>
+
+
+    
   </body>
 </html>
