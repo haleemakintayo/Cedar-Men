@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.shortcuts import reverse 
-
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -77,6 +77,31 @@ class Product(models.Model):
             'slug': self.slug
         })
     
+
+class Wishlist(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wishlist'
+    )
+    products = models.ManyToManyField(
+        Product,
+        blank=True,
+        related_name='wishlisted_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Wishlist for {self.user.username}"
+    
+    def add_product(self, product):
+        """Add a product to the wishlist."""
+        self.products.add(product)
+    
+    def remove_product(self, product):
+        """Remove a product from the wishlist."""
+        self.products.remove(product)   
 
 
  #Im waiting for the auth to finish before implementing it   

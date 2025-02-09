@@ -49,6 +49,7 @@
                                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 grid-item cat1">
                                     <div class="shop hover-style mb-30">
                                         <div class="shop-img">
+                                            
                                             <a href="#">
                                                 <img src="{{ product.image.url }}" alt="{{ product.name }}" />
                                             </a>    
@@ -59,6 +60,9 @@
                                             </div>
                                             <div class="product-cart">
                                                 <a href="{{ product.get_url }}"><i class="pe-7s-cart"></i></a>
+                                            </div>
+                                            <div class="product-wishlist">
+                                                <a href="{% url 'add_to_wishlist' product.slug %}"><i class="fa fa-heart"></i></a>
                                             </div>  
                                         </div>                          
                                     </div>

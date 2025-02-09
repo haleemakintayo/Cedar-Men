@@ -54,10 +54,23 @@
     transition: all 0.3s ease-in-out 0s;
     z-index: 99;
 }
+.product-wishlist {
+    top: 27px;
+    position: absolute;
+    right: 20px;
+    opacity: 0;
+    transition: all 0.3s ease-in-out 0s;
+    z-index: 99;
+}
 .product-cart a {
     color: #333;
     font-size: 30px;
 }
+.product-wishlist a {
+    color: #333;
+    font-size: 30px;
+}
+
 .product-cart a:hover {
     opacity: .5;
 }
@@ -65,6 +78,16 @@
     color: #000;
 }
 .shop:hover .product-cart {
+    opacity: 1;
+}
+
+.product-wishlist a:hover {
+    opacity: .5;
+}
+.product-wishlist a:hover {
+    color: #000;
+}
+.shop:hover .product-wishlist {
     opacity: 1;
 }
 .hover-style::before {
