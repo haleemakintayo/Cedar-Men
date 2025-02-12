@@ -28,6 +28,9 @@
                                             <div class="product-cart">
                                                 <a href="{{ product.get_url }}"><i class="pe-7s-cart"></i></a>
                                             </div> 
+                                            <div class="product-wishlist">
+                                                <a href="{% url 'add_to_wishlist' product.slug %}"><i class="fa fa-heart"></i></a>
+                                            </div>
                                         </div>							
                                     </div>
                                 </div>
