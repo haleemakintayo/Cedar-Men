@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // AJAX submission for the Add-to-Cart form.
+        // AJAX submission for the Add-to-Cart form.
     $('#add-to-cart-form').on('submit', function(e) {
         e.preventDefault(); // Prevent the default form submission.
         var formData = $(this).serialize(); // Serialize all form data.
@@ -213,17 +213,28 @@ document.addEventListener('DOMContentLoaded', function() {
             method: "POST",
             data: formData,
             success: function(response) {
-                // For example, update a mini-cart count or show a success message.
-                alert("Item added to cart! Total items: " + response.total_items);
-                // Optionally update a cart summary element:
+                
+                var messageHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                    '<strong>Success!</strong> Item added to cart! <a href="{% url 'cart_summary' %}">view cart</a> Total items: ' + response.total_items +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">' +
+                    '<span aria-hidden="true">&times;</span></button></div>';
+                $("#messages").html(messageHtml);
+                
                 $('.cart-count').text(response.total_items);
                 $('.cart-total').text("€" + parseFloat(response.total_price).toFixed(2));
             },
             error: function(xhr) {
-                alert("Error adding item to cart: " + xhr.responseText);
+                var errorHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                    '<strong>Error!</strong> ' + xhr.responseText +
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                    '<span aria-hidden="true">&times;</span></button></div>';
+                $("#messages").html(errorHtml);
             }
         });
     });
+
+    
+
 });
 </script>
 {% endblock %}

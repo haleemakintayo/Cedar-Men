@@ -154,16 +154,19 @@
 /* cart */
 
 .shopping-cart > ul {
-    background: #16171f none repeat scroll 0 0;
+    background: #16171f;
     opacity: 0;
     padding: 20px;
     position: absolute;
     right: 0px;
     top: 140%;
     transition: all 0.3s ease 0s;
-    visibility: hidden;
     width: 270px;
     z-index: 9999;
+    max-height: 400px;   
+    overflow-y: auto;  
+    
+
 }
 .shopping-cart:hover ul {
     opacity: 1;
@@ -176,6 +179,14 @@
 }
 .cart-img {
     float: left;
+}
+.cart-img img {
+    max-width: 100px;   
+    max-height: 100px;     
+    width: auto;
+    height: auto;
+    object-fit: cover;    
+    display: block;
 }
 .cart-content {
     float: left;

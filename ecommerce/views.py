@@ -76,7 +76,7 @@ def remove_from_wishlist(request, product_slug):
         messages.error(request, "You need to be logged in to modify your wishlist.")
     return redirect('wishlist')
 
-@login_required(login_url='login')
+
 def wishlist(request):
     if request.user.is_authenticated:
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)

@@ -54,6 +54,13 @@
     transition: all 0.3s ease-in-out 0s;
     z-index: 99;
 }
+#messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;  
+    width: auto;
+}
 .product-wishlist {
     top: 27px;
     position: absolute;
