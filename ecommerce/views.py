@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect,get_object_or_404
+from django.contrib import messages
 
 from .models import (
-    Product, Blog,TeamMember,
+    Product, Blog,TeamMember,Wishlist
     
     ) 
 
@@ -54,8 +55,36 @@ def checkout(request):
     return render(request, 'checkout.html')
 
 
+def add_to_wishlist(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    if request.user.is_authenticated:
+        
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        wishlist.products.add(product)
+        messages.success(request, f"{product.name} was added to your wishlist.")
+    else:
+        messages.error(request, "Please log in to add items to your wishlist.")
+    return redirect('wishlist')
+
+def remove_from_wishlist(request, product_slug):
+    if request.user.is_authenticated:
+        product = get_object_or_404(Product, slug=product_slug)
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        wishlist.products.remove(product)
+        messages.success(request, f"{product.name} has been removed from your wishlist.")
+    else:
+        messages.error(request, "You need to be logged in to modify your wishlist.")
+    return redirect('wishlist')
+
+
 def wishlist(request):
-    return render(request, 'wishlist.html')
+    if request.user.is_authenticated:
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        products = wishlist.products.all()
+    else:
+        products = []  
+    
+    return render(request, 'wishlist.html', {'products': products})
 
 
 def blog_details(request, id):

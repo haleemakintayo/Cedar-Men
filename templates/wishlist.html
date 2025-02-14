@@ -2,83 +2,71 @@
 {% load static %}
 
 {% block content %}
-
-
-
-            <!-- breadcrumb start -->
-            <div class="breadcrumb-area">
-                <div class="container-fluid text-center">
-                    <div class="breadcrumb-stye gray-bg ptb-100">
-                        <h2 class="page-title">wishlist</h2>
-                        <ul>
-                            <li><a href="{% url 'home' %}">home</a></li>
-                            <li><a href="{% url 'shop' %}">shop</a></li>
-                            <li class="active">wishlist</li>
-                        </ul>
-                    </div>
-                </div>
+    <!-- breadcrumb start -->
+    <div class="breadcrumb-area">
+        <div class="container-fluid text-center">
+            <div class="breadcrumb-stye gray-bg ptb-100">
+                <h2 class="page-title">Wishlist</h2>
+                <ul>
+                    <li><a href="{% url 'home' %}">home</a></li>
+                    <li><a href="{% url 'shop' %}">shop</a></li>
+                    <li class="active">wishlist</li>
+                </ul>
             </div>
-            <!-- breadcrumb end -->
-            <!-- shopping-cart-area start -->
-            <div class="cart-main-area ptb-100 wishlist">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-xl-12 col-lg-12 col-md-12 col-12">
-                            <h1 class="cart-heading">wishlist</h1>
-                            <form action="#">
-                                <div class="table-content table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th class="product-name">remove</th>
-                                                <th class="product-price">images</th>
-                                                <th class="product-name">Product</th>
-                                                <th class="product-price">Price</th>
-                                                <th class="product-quantity">Quantity</th>
-                                                <th class="product-subtotal">Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="product-remove"><a href="#"><i class="fa fa-times"></i></a></td>
-                                                <td class="product-thumbnail">
-                                                    <a href="#"><img src="{% static 'assets/img/cart/1.jpg' %}" alt=""></a>
-                                                </td>
-                                                <td class="product-name"><a href="#">Vestibulum suscipit</a></td>
-                                                <td class="product-price"><span class="amount">$165.00</span></td>
-                                                <td class="product-quantity">
-                                                    <input value="1" type="number">
-                                                </td>
-                                                <td class="product-subtotal">$165.00</td>
-                                                
-                                            </tr>
-                                            <tr>
-                                                <td class="product-remove"><a href="#"><i class="fa fa-times"></i></a></td>
-                                                <td class="product-thumbnail">
-                                                    <a href="#"><img src="{% static 'assets/img/cart/2.jpg' %}" alt=""></a>
-                                                </td>
-                                                <td class="product-name"><a href="#">Vestibulum dictum</a></td>
-                                                <td class="product-price"><span class="amount">$150.00</span></td>
-                                                <td class="product-quantity">
-                                                    <input value="1" type="number">
-                                                </td>
-                                                <td class="product-subtotal">$150.00</td>
-                                                
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </form>
+        </div>
+    </div>
+    <!-- breadcrumb end -->
+
+    <!-- wishlist area start -->
+    <div class="cart-main-area ptb-100 wishlist">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-12">
+                    <h1 class="cart-heading">Your Wishlist</h1>
+                    
+                        <div class="table-content table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="product-name">Remove</th>
+                                        <th class="product-thumbnail">Image</th>
+                                        <th class="product-name">Product</th>
+                                        <th class="product-price">Price</th>
+                                    </tr>
+                                </thead>
+                                {% if products %}
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td class="product-remove">
+                                            <a href="{% url 'remove_from_wishlist' product.slug %}">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                        </td>
+                                        <td class="product-thumbnail">
+                                            <a href="{{ product.get_url }}">
+                                                <img class="wishlist-thumbnail" src="{{ product.image.url }}" alt="{{ product.name }}">
+                                            </a>
+                                        </td>
+                                        
+                                        <td class="product-name">
+                                            <a href="{{ product.get_url }}">{{ product.name }}</a>
+                                        </td>
+                                        <td class="product-price">
+                                            <span class="amount">€{{ product.price }}</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                {% else %}
+                        <p>Your wishlist is empty.</p>
+                                {% endif %}
+                            </table>
                         </div>
-                    </div>
+                    
                 </div>
             </div>
-            <!-- shopping-cart-area end -->
-            {% endblock %}
-            
-        
-        
-        
-        
-        
-	
+        </div>
+    </div>
+    <!-- wishlist area end -->
+{% endblock %}
