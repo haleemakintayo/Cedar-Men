@@ -15,7 +15,8 @@ class Cart(models.Model):
     
     def __str__(self):
         if self.user:
-            return f"Cart for {self.user.username}"
+            names = self.user.fullname.split(' ')
+            return f"Cart for {names[1]}"
         return f"Cart {self.session_key}"
     
     def total_items(self):
