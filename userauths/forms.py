@@ -1,152 +1,90 @@
+from django.forms import ModelForm
 from django import forms
-from django.core.validators import RegexValidator
+from .models import User
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.forms import AuthenticationForm 
-from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 
-class UserRegistrationForm(forms.Form): 
-  # Define custom error messages
-  error_messages = {
-    'required': 'This field is required.', 
-    'invalid': 'Please enter a valid value',
-    'password_mismatch': 'The two password fields do not match.',
-    'emial_exists': 'This email is already registered.',
-    'username_exists': 'This username is already taken.', 
-  }
+class UserForm(ModelForm):
+  class Meta: 
+    model = User
+    fields = [
+      "fullname", 
+      "email", 
+      "password1", 
+      "password2",
+    ]
 
-  # Form fields with built-in validation 
-  username = forms.CharField(
-    min_length=3, 
-    max_length=30,
-    required=True,
-    widget=forms.TextInput(attrs={
-      'class': 'form-control',
-      'placeholder': 'Enter username'
-    }),
-    error_messages={
-      'required': error_messages['required'], 
-      'min_length': 'Username must be at least 3 characters long.',
-      'max_length': 'Username cannot exceed 30 characters.'
+    widgets = {
+      "fullname": forms.TextInput(attrs={
+        'placeholder': "Full Name"
+      }),
+      "email": forms.EmailInput(attrs={
+        'placeholder': "Email"
+      }),
+      "password1": forms.PasswordInput(attrs={
+        'placeholder': 'Password'
+      }), 
+      "password2": forms.PasswordInput(attrs={
+        'placeholder': "Confirm Password"
+      }),      
     }
-  )
 
-  email = forms.EmailField(
-    required=True, 
-    widget=forms.EmailInput(attrs={
-      'class': 'form-control', 
-      'placeholder': 'Enter email'
-    }), 
-    error_messages={
-      'required': error_messages['required'],
-      'invalid': 'Pleae enter a valid email address'
-    }
-  )
+  def clean_fullname(self):
+    fullname = self.cleaned_data.get('fullname')
+    if fullname: 
+      # Split the name into parts and filter out empty srings
+      name_parts = [part.strip() for part in fullname.split() if part.strip()]
 
-  password1 = forms.CharField(
-    required=True,
-    widget=forms.PasswordInput(attrs={
-      'class': 'form-control', 
-      'placeholder': 'Enter password',
-    }), 
-    error_messages={
-      'required': error_messages['required']
-    }
-  )
+      # Check if there are at least two parts
+      if len(name_parts) < 2: 
+        raise ValidationError("Please enter your full name (first name, last name and or any other names.)")
+      
+      # Capitalize each part of the name
+      fullname = ' '.join(part.capitalize() for part in name_parts)
 
-  password2 = forms.CharField(
-    required=True,
-    widget=forms.PasswordInput(attrs={
-      'class': 'form-control', 
-      'placeholder': 'Confirm password',
-    }), 
-    error_messages={
-      'required': error_messages['required']
-    }
-  )
+      return fullname
 
-  phone_number = forms.CharField(
-    required=True, 
-    validators=[
-      RegexValidator(
-        regex=r'^\+?1?\d{9,15}$', 
-        message='Phone number must be entered in the format: "+99999999". Up to 15 digits allowed.'
-      )
-    ], 
-    widget=forms.TextInput(attrs={
-      'class': 'form-control',
-      'placeholder': 'Enter phone number'
-    })
-  )
-
-  def clean_username(self):
-    """Custom validation for username"""
-    username = self.cleaned_data.get('username')
-
-    # Example: Check if username contains only allowed characters
-    if not username.isalnum():
-      raise forms.ValidationError('Username can only contain letters and numbers.')
-
-    # Example: Check if username exists in database
-    from django.contrib.auth.models import User
-    if User.objects.filter(username=username).exists():
-      raise form.ValidationError(self.error_message['username_exists'])
-    
-    return username
-  
-  def clean_email(self): 
-    """Custom validation for email"""
+  def clean_email(self):
     email = self.cleaned_data.get('email')
-
-    # Example: Check if email exists in database
-    from django.contrib.auth.models import User
-    if User.objects.filter(email=email).exists(): 
-      raise forms.ValidationError(self.error_messages['email_exists'])
-
+    if User.objects.filter(email=email).exists():
+      raise ValidationError('A user with that email already exists')
     return email
   
-  def clean(self): 
-    """Cross-field validation"""
+  def clean_password2(self):
+    password1 = self.cleaned_data.get('password1')
+    password2 = self.cleaned_data.get('password2')
+    if password1 and password2 and password1 != password2: 
+      raise ValidationError("Passwords do not match.")
+    return password2
+  
+  def clean(self):
     cleaned_data = super().clean()
     password1 = cleaned_data.get('password1')
-    password2 = cleaned_data.get('password2')
 
-    if password1 and password2: 
-      # Validate password complexity
-      try: 
+    if password1:
+      try:    
+        #Run the password through Django's validators
         validate_password(password1)
-      except forms.ValidationError as e: 
-        self.add_error('password1', e)
-
-        #Check if password match: 
-        if password1 == password2: 
-          raise forms.ValidationError({
-            'password2': self.error_mesages['password_mismatch']
-          })
-
+      except ValidationError as e:
+        self.add_error('password1', e) 
+    
     return cleaned_data
-
-  def save(self):
-    """Save the user data"""
-    if self.is_valid():
-      cleaned_data = self.cleaned_data
-      # Create user object (example)
-      from django.contrib.auth.models import User
-      user = User.objects.create_user(
-        username=cleaned_data['username'],
-        email=cleaned_data['email'],
-        password=cleaned_data['password1']
-      )
-      # Add additional fields as needed
-      user.phone_number = cleaned_data['phone_number']
+  
+  def save(self, commit=True):
+    user = super().save(commit=False)
+    # Set the password properly to hash it
+    user.set_password(self.cleaned_data['password1'])
+    if commit: 
       user.save()
-      return user
-    return None
+    return user
 
-class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter username'})
+
+# Login form
+class LoginForm(forms.Form):
+    email = forms.EmailField(
+        max_length=255,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}),
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password'}),
     )
-
