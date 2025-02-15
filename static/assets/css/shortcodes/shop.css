@@ -61,6 +61,17 @@
     z-index: 1050;  
     width: auto;
 }
+.rating-widget i {
+    cursor: pointer;
+    font-size: 24px;      /* Adjust as needed */
+    color: #ccc;          /* Color for unselected stars */
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .rating-widget i.active {
+    color: #ffcc00;       /* Color for selected stars */
+  }
+  
 .product-wishlist {
     top: 27px;
     position: absolute;

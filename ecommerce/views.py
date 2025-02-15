@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
-
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from .models import (
-    Product, Blog,TeamMember,Wishlist
+    Product, Blog,TeamMember,Wishlist,Review
     
     ) 
 
@@ -85,6 +86,26 @@ def wishlist(request):
         products = []  
     
     return render(request, 'wishlist.html', {'products': products})
+
+@require_POST
+def add_review(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    rating = int(request.POST.get('rating', 5))
+    comment = request.POST.get('comment', '').strip()
+    if not comment:
+        return JsonResponse({'error': 'Comment cannot be empty.'}, status=400)
+    user = request.user if request.user.is_authenticated else None
+    review = Review.objects.create(product=product, rating=rating, comment=comment, user=user)
+    
+    data = {
+        'review': {
+            'user': review.user.username if review.user else 'Anonymous',
+            'rating': review.rating,
+            'comment': review.comment,
+            'created_at': review.created_at.strftime('%Y-%m-%d %H:%M'),
+        }
+    }
+    return JsonResponse(data)
 
 
 def blog_details(request, id):
