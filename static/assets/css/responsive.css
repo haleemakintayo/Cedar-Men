@@ -349,7 +349,11 @@
 /* small mobile :320px. */
 @media (max-width: 767px) {
 
- 
+ .logo {
+  width: 200%;
+  margin-left: -50px;
+  
+ }
     
     .waraper {
       padding: 0;
@@ -647,6 +651,7 @@ h2.page-title {
 .user > a {
   padding: 30px 0 10px 12px;
 }
+
 .language-menu.none {
 	display: block;
 }    
