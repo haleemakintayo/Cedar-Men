@@ -99,7 +99,7 @@ def add_review(request, product_slug):
     
     data = {
         'review': {
-            'user': review.user.username if review.user else 'Anonymous',
+            'user': review.user.fullname if review.user else 'Anonymous',
             'rating': review.rating,
             'comment': review.comment,
             'created_at': review.created_at.strftime('%Y-%m-%d %H:%M'),
