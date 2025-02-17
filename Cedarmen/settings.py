@@ -84,12 +84,15 @@ WSGI_APPLICATION = 'Cedarmen.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"    
+#     )
+# }
 
+DATABASES = {
+    'default': dj_database_url.config(default='postgresql://mysite:NNA0WEhdn7PgGjvZknBmQxQoA4K26bqb@dpg-cupq3hogph6c73crsnb0-a.oregon-postgres.render.com/mysite_bkg9')
+}
 
 
 
