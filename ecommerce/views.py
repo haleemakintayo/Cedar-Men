@@ -59,32 +59,35 @@ def checkout(request):
 def add_to_wishlist(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     if request.user.is_authenticated:
-        
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.add(product)
-        messages.success(request, f"{product.name} was added to your wishlist.")
+        success_msg = f"{product.name} was added to your wishlist."
+        messages.success(request, success_msg)
+        return JsonResponse({'success': True, 'message': success_msg})
     else:
-        messages.error(request, "Please log in to add items to your wishlist.")
-    return redirect('wishlist')
+        error_msg = "Please log in to add items to your wishlist."
+        messages.error(request, error_msg)
+        return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
 def remove_from_wishlist(request, product_slug):
     if request.user.is_authenticated:
         product = get_object_or_404(Product, slug=product_slug)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.remove(product)
-        messages.success(request, f"{product.name} has been removed from your wishlist.")
+        success_msg = f"{product.name} has been removed from your wishlist."
+        messages.success(request, success_msg)
+        return JsonResponse({'success': True, 'message': success_msg})
     else:
-        messages.error(request, "You need to be logged in to modify your wishlist.")
-    return redirect('wishlist')
-
+        error_msg = "You need to be logged in to modify your wishlist."
+        messages.error(request, error_msg)
+        return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
 def wishlist(request):
     if request.user.is_authenticated:
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         products = wishlist.products.all()
     else:
-        products = []  
-    
+        products = []
     return render(request, 'wishlist.html', {'products': products})
 
 @require_POST

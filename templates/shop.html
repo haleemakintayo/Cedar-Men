@@ -29,7 +29,7 @@
                                                 <a href="{{ product.get_url }}"><i class="pe-7s-cart"></i></a>
                                             </div> 
                                             <div class="product-wishlist">
-                                                <a href="{% url 'add_to_wishlist' product.slug %}"><i class="fa fa-heart"></i></a>
+                                                <a href="{% url 'add_to_wishlist' product.slug %}" class="add-to-wishlist"><i class="fa fa-heart"></i></a>
                                             </div>
                                         </div>							
                                     </div>
@@ -39,6 +39,39 @@
                     </div>
                 </div>
             </div>			
+            <script>
+                $(document).ready(function(){
+                  $(document).on('click', '.add-to-wishlist', function(e){
+                      e.preventDefault();
+                      var link = $(this);
+                      var url = link.attr('href');
+                      
+                      $.ajax({
+                          url: url,
+                          type: "POST",
+                          data: {
+                              'csrfmiddlewaretoken': '{{ csrf_token }}'
+                          },
+                          success: function(response) {
+                              var messageType = response.success ? 'success' : 'danger';
+                              var messageHtml = '<div class="alert alert-' + messageType + ' alert-dismissible fade show" role="alert">' +
+                                                  '<strong>' + (response.success ? 'Success!' : 'Error!') + '</strong> ' + response.message +
+                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                  '</div>';
+                              $("#messages").html(messageHtml);
+                          },
+                          error: function(xhr) {
+                              var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                                  '<strong>Error!</strong> ' + xhr.responseText +
+                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                  '</div>';
+                              $("#messages").html(messageHtml);
+                          }
+                      });
+                  });
+                });
+            </script>
+                
          <!-- shop area end -->
             {% endblock %}
         

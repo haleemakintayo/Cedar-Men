@@ -62,7 +62,7 @@
                                                 <a href="{{ product.get_url }}"><i class="pe-7s-cart"></i></a>
                                             </div>
                                             <div class="product-wishlist">
-                                                <a href="{% url 'add_to_wishlist' product.slug %}"><i class="fa fa-heart"></i></a>
+                                                <a href="{% url 'add_to_wishlist' product.slug %}" class="add-to-wishlist"><i class="fa fa-heart"></i></a>
                                             </div>  
                                         </div>                          
                                     </div>
@@ -124,4 +124,41 @@
 
 
             <!-- blog area end -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                $(document).ready(function(){
+                  // Delegate click event for add-to-wishlist links
+                  $(document).on('click', '.add-to-wishlist', function(e){
+                      e.preventDefault(); // Cancel the default navigation
+                      var url = $(this).attr('href');
+                      
+                      $.ajax({
+                          url: url,
+                          type: "POST",
+                          data: {
+                              'csrfmiddlewaretoken': '{{ csrf_token }}'
+                          },
+                          success: function(response) {
+                              var alertType = response.success ? 'success' : 'danger';
+                              var messageHtml = '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
+                                                  '<strong>' + (response.success ? 'Success!' : 'Error!') + '</strong> ' + response.message +
+                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                  '</div>';
+                              $("#messages").html(messageHtml);
+                          },
+                          error: function(xhr) {
+                              var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                                  '<strong>Error!</strong> ' + xhr.responseText +
+                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                  '</div>';
+                              $("#messages").html(messageHtml);
+                          }
+                      });
+                      return false; // Ensures no further action
+                  });
+                });
+                </script>
+                
+                
+                
             {% endblock %}
