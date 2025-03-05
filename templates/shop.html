@@ -14,7 +14,7 @@
                     <div class="shop-style-all mt-50">
                         <div class="grid row">
                             {% for product in products %}
-                                <div class="col-lg-3 col-md-6 col-sm-6 col-12 grid-item cat1">
+                                <div class="col-lg-3 col-md-6 col-sm-6 col-6 grid-item cat1">
                                     <div class="shop-style-all">
                                         <div class="shop hover-style mb-30">
                                             <a href="{{ product.get_url }}">
@@ -49,27 +49,29 @@
                       var url = $(this).attr('href');
                       
                       $.ajax({
-                          url: url,
-                          type: "POST",
-                          data: {
-                              'csrfmiddlewaretoken': '{{ csrf_token }}'
-                          },
-                          success: function(response) {
-                              var alertType = response.success ? 'success' : 'danger';
-                              var messageHtml = '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
-                                                  '<strong>' + (response.success ? 'Success!' : 'Error!') + '</strong> ' + response.message +
-                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                                                  '</div>';
-                              $("#messages").html(messageHtml);
-                          },
-                          error: function(xhr) {
-                              var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                                                  '<strong>Error!</strong> ' + xhr.responseText +
-                                                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                                                  '</div>';
-                              $("#messages").html(messageHtml);
-                          }
-                      });
+                            url: url,
+                            type: "POST",
+                            dataType: "json",  
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                var alertType = response.success ? 'success' : 'danger';
+                                var messageHtml = '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
+                                                response.message +
+                                                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                '</div>';
+                                $("#messages").html(messageHtml);
+                            },
+                            error: function(xhr) {
+                                var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                                xhr.responseText +
+                                                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                '</div>';
+                                $("#messages").html(messageHtml);
+                            }
+                        });
+
                       return false; // Ensures no further action
                   });
                 });
