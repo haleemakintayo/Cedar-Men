@@ -12,7 +12,6 @@ def checkout(request):
         return redirect('cart_summary')
 
     if request.method == 'POST':
-        
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -49,7 +48,7 @@ def checkout(request):
             )
         cart.items.all().delete()
         messages.success(request, "Your order has been placed successfully!")
-        return redirect('order_confirmation', order_id=order.id)
+        return redirect('generate-invoice', order_id=order.id)
     else:
         context = {
             'cart': cart,

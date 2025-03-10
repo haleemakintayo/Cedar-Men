@@ -1,0 +1,75 @@
+{% extends 'theme/base.html' %} {% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">Orders</h2>
+
+  <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th>ORDER ID</th>
+        <th>CUSTOMER</th>
+        <th>TOTAL AMOUNT</th>
+        <th>STATUS</th>
+        <th>CREATED AT</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.customer.fullname }}</td>
+        <td>${{ order.total }}</td>
+        <td>
+          {% if order.status == "pending" %}
+          <span class="badge badge-warning">Pending</span>
+          {% elif order.status == "paid" %}
+          <span class="badge badge-success">Paid</span>
+          {% else %}
+          <span class="badge badge-danger">Failed</span>
+          {% endif %}
+        </td>
+        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center">No orders found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination Controls -->
+  <!-- <nav aria-label="Invoice Pagination">
+    <ul class="pagination justify-content-center">
+      {% if invoice.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1">First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ invoice.previous_page_number }}"
+          >Previous</a
+        >
+      </li>
+      {% endif %}
+
+      <li class="page-item active">
+        <span class="page-link">
+          Page {{ invoice.number }} of {{ invoice.paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if invoice.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ invoice.next_page_number }}"
+          >Next</a
+        >
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ invoice.paginator.num_pages }}"
+          >Last</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </nav> -->
+</div>
+{% endblock %}

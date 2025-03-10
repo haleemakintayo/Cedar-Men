@@ -1,8 +1,12 @@
 from django.db import models
-from django.utils.text import slugify
+from django.utils.text import slugify 
 from django.shortcuts import reverse 
 from django.conf import settings
-
+from django.utils import timezone
+from userauths.models import User
+from django.apps import apps
+from userauths.utils import generate_invoice_number
+from decimal import Decimal
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -44,12 +48,11 @@ class Size(models.Model):
         return self.label        
 
 class Product(models.Model):
-
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     old_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True, default=1)
     stock = models.IntegerField()
     colors = models.ManyToManyField(Color, blank=True)
     image = models.ImageField(upload_to='products/')
@@ -60,6 +63,7 @@ class Product(models.Model):
     composition = models.CharField(max_length=255, blank=True, null=True)
     style = models.CharField(max_length=255, blank=True, null=True)
     properties = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -126,8 +130,6 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
-    
-
 
 class TeamMember(models.Model):
     name = models.CharField(max_length=100)
@@ -141,5 +143,47 @@ class TeamMember(models.Model):
 
     def __str__(self):
         return self.name
-  
 
+class Invoice(models.Model):
+    # Order = apps.get_model('orders', 'Order')
+
+    status_choices = [
+        ("pending", "Pending"), 
+        ("paid", "Paid"),
+        ("failed", "Failed"),
+    ]
+
+    invoice_number = models.CharField(max_length=50, unique=True, default=generate_invoice_number, blank=False, null=False)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.OneToOneField('orders.Order', on_delete=models.CASCADE,   null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=10, choices=status_choices, default="pending")
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.invoice_number 
+
+    def calculate_total(self):
+        total = sum(Decimal(item.total_price) for item in self.invoiceitem_set.all() if item.total_price is not None)
+        self.total_amount = total
+        self.save()
+
+class InvoiceItem(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=255, default='Nil')
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    quantity = models.PositiveIntegerField(default=1)
+
+    @property
+    def total_price(self):
+        return Decimal(self.unit_price or 0) * Decimal(self.quantity or 0)
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs) # Save the item first
+        self.invoice.calculate_total()
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product_name}"
+    
