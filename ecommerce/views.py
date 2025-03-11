@@ -55,31 +55,28 @@ def blog(request):
 def checkout(request):
     return render(request, 'checkout.html')
 
-
+@require_POST
 def add_to_wishlist(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     if request.user.is_authenticated:
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.add(product)
         success_msg = f"{product.name} was added to your wishlist."
-        messages.success(request, success_msg)
         return JsonResponse({'success': True, 'message': success_msg})
     else:
         error_msg = "Please log in to add items to your wishlist."
-        messages.error(request, error_msg)
         return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
+@require_POST
 def remove_from_wishlist(request, product_slug):
     if request.user.is_authenticated:
         product = get_object_or_404(Product, slug=product_slug)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.remove(product)
         success_msg = f"{product.name} has been removed from your wishlist."
-        messages.success(request, success_msg)
         return JsonResponse({'success': True, 'message': success_msg})
     else:
         error_msg = "You need to be logged in to modify your wishlist."
-        messages.error(request, error_msg)
         return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
 def wishlist(request):

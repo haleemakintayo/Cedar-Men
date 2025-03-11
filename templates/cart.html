@@ -107,7 +107,7 @@
                         },
                         success: function(response){
                             // Update the subtotal cell in this row
-                            row.find('.product-subtotal').text("$" + response.subtotal.toFixed(2));
+                            row.find('.product-subtotal').text("£" + response.subtotal.toFixed(2));
                             // Update the cart total display
                             $('#cart-total').text("£" + response.total.toFixed(2));
                         },
