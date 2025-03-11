@@ -10,29 +10,47 @@ class UserForm(ModelForm):
     fields = [
       "fullname", 
       "email", 
+      "user_status",
       "password1", 
       "password2",
     ]
 
     widgets = {
       "fullname": forms.TextInput(attrs={
-        'placeholder': "Full Name"
+        'placeholder': "Full Name",
+        'class': 'form-control',
       }),
       "email": forms.EmailInput(attrs={
-        'placeholder': "Email"
+        'placeholder': "Email",
+        'class': 'form-control',
       }),
       "password1": forms.PasswordInput(attrs={
-        'placeholder': 'Password'
+        'placeholder': 'Password',
+        'class': 'form-control',
       }), 
       "password2": forms.PasswordInput(attrs={
-        'placeholder': "Confirm Password"
+        'placeholder': "Confirm Password",
+        'class': 'form-control',
       }),      
     }
+
+  def __init__(self, *args, **kwargs):
+    show_user_status = kwargs.pop("show_user_status", False)
+    super().__init__(*args, **kwargs)
+
+    if show_user_status: 
+      self.fields["user_status"] = forms.ChoiceField(
+        choices=User.USER_CHOICES_FIELD, 
+        widget=forms.Select(attrs={"class": "form-control"})
+      )
+
+    # for field in self.fields.items(): 
+    #   field.widgets.attrs.update({"class": "form-control"})
 
   def clean_fullname(self):
     fullname = self.cleaned_data.get('fullname')
     if fullname: 
-      # Split the name into parts and filter out empty srings
+      # Split the name into parts and filter out empty strings
       name_parts = [part.strip() for part in fullname.split() if part.strip()]
 
       # Check if there are at least two parts
@@ -71,13 +89,25 @@ class UserForm(ModelForm):
     return cleaned_data
   
   def save(self, commit=True):
+    # Stall the save process
     user = super().save(commit=False)
-    # Set the password properly to hash it
-    user.set_password(self.cleaned_data['password1'])
-    if commit: 
-      user.save()
-    return user
 
+    email = self.cleaned_data['email']
+    password = self.cleaned_data['password1']
+    user_status = self.cleaned_data['user_status']
+
+    if commit and user_status == 'staffs':
+      user = User.objects.create_staff_user(email=email, password=password)
+
+      user.save()
+
+    else:
+      user = User.objects.create_user(email=email, password=password)
+
+      user.save()
+    # # Set the password properly to hash it
+    # user.set_password(self.cleaned_data['password1'])
+    return user
 
 # Login form
 class LoginForm(forms.Form):
@@ -88,3 +118,13 @@ class LoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password'}),
     )
+
+class StaffLoginForm(forms.Form):
+    email = forms.EmailField(
+        max_length=255,
+        widget=forms.EmailInput(attrs={'class': 'form-control input-lg', 'placeholder': 'Enter your email', 'id': 'email', 'aria-describedby': 'emailHelp'}),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control inpout-lg', 'placeholder': 'Enter your password', 'id': 'password'}),
+    )
+    # account_type = forms.ChoiceField()

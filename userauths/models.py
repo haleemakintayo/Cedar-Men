@@ -13,6 +13,10 @@ class CustomUserManager(UserManager):
     email = self.normalize_email(email)
     if not email: 
       raise ValueError("You have not provided a valid e-mail ")
+
+    if self.model.objects.filter(email=email).exists():
+      raise ValueError("A user with this email already exists.")
+    
     user = self.model(email=email, **extra_fields)
     user.set_password(password)
     user.save(using=self._db)
@@ -33,14 +37,13 @@ class CustomUserManager(UserManager):
   
   def create_staff_user(self, email=None, password=None, **extra_fields):
     extra_fields.setdefault('is_staff', True)
-    extra_fields.setdefault('is_superuser', True)
+    extra_fields.setdefault('is_superuser', False)
+    extra_fields.setdefault('user_status', 'staffs')
 
     return self._create_user(email, password, **extra_fields)
   
 class User(AbstractBaseUser, PermissionsMixin):
   USER_CHOICES_FIELD = [
-    ('owner', 'Shop Owner'),
-    ('managers', 'Manager'),
     ('staffs', 'Staff'),
     ('customers', 'Customer'),
   ]
@@ -51,6 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
   password1 = models.CharField(max_length=20, null=True)
   password2 = models.CharField(max_length=20, null=True)
   tracker=FieldTracker(fields=['user_status'])
+  profile_picture=models.ImageField(upload_to='staff_images/', blank=True, null=True)
 
   is_active = models.BooleanField(default=True)
   is_superuser = models.BooleanField(default=False)
