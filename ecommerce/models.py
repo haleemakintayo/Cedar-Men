@@ -6,7 +6,8 @@ from django.utils import timezone
 from userauths.models import User
 from django.apps import apps
 from userauths.utils import generate_invoice_number
-from decimal import Decimalfrom django.utils import timezone
+from decimal import Decimal
+from django.utils import timezone
 
 
 class Category(models.Model):
