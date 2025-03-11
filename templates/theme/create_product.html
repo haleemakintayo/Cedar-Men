@@ -1,0 +1,53 @@
+{% extends 'theme/base.html' %} {% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Create New Product</h2>
+
+  <!-- prettier-ignore -->
+  {% if messages %} 
+    {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %} {% endif %}
+
+  <!-- Display Form Errors -->
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <strong>Please fix the following errors:</strong>
+    <ul>
+      {% for field, errors in form.errors.items %}
+      <li><strong>{{ field|title }}</strong>: {{ errors|join:", " }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form
+    method="post"
+    enctype="multipart/form-data"
+    class="shadow p-5 bg-light rounded"
+  >
+    {% csrf_token %} {% for field in form %}
+    <!-- prettier-ignore -->
+    <div class="mt-3 mb-4">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }} 
+        {% if field.help_text %}
+          <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %} 
+        {% for error in field.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Save Product</button>
+    <a
+      href="
+    
+    
+    {% url 'dashboard-products' %}"
+      class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}

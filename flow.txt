@@ -1,0 +1,17 @@
+checkout-page -> generate invoice -> invoice_detail (buttons to either download invoice, make payment or cancel) -> order confirmation page. 
+
+I'm not done with them 
+
+Fix: 
+- Invoice list in custom-admin ✅
+- Email returning error during registration if it already exists ✅
+- Invoice item showing Product.object(no) instead of product name ✅
+- Invoice detail base.html ✅ 
+- Invoice total_price not being calculated. ✅ 
+- Password fields showing to backend operator. Encrypt both password fields. ✅
+- The whole order rendering ✅
+- The filter functionality for product, invoice and order rendering
+- Fix product rending div in frontend (Might have something to do with the ProductForm)
+- user fullname not saving
+- User profile editing and proper staff registration/editing too
+- view-cart hover effect fix 
