@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
-
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from .models import (
-    Product, Blog,TeamMember,Wishlist
+    Product, Blog,TeamMember,Wishlist,Review
     
     ) 
 
@@ -54,37 +55,57 @@ def blog(request):
 def checkout(request):
     return render(request, 'checkout.html')
 
-
+@require_POST
 def add_to_wishlist(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     if request.user.is_authenticated:
-        
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.add(product)
-        messages.success(request, f"{product.name} was added to your wishlist.")
+        success_msg = f"{product.name} was added to your wishlist."
+        return JsonResponse({'success': True, 'message': success_msg})
     else:
-        messages.error(request, "Please log in to add items to your wishlist.")
-    return redirect('wishlist')
+        error_msg = "Please log in to add items to your wishlist."
+        return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
+@require_POST
 def remove_from_wishlist(request, product_slug):
     if request.user.is_authenticated:
         product = get_object_or_404(Product, slug=product_slug)
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         wishlist.products.remove(product)
-        messages.success(request, f"{product.name} has been removed from your wishlist.")
+        success_msg = f"{product.name} has been removed from your wishlist."
+        return JsonResponse({'success': True, 'message': success_msg})
     else:
-        messages.error(request, "You need to be logged in to modify your wishlist.")
-    return redirect('wishlist')
-
+        error_msg = "You need to be logged in to modify your wishlist."
+        return JsonResponse({'success': False, 'message': error_msg}, status=403)
 
 def wishlist(request):
     if request.user.is_authenticated:
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         products = wishlist.products.all()
     else:
-        products = []  
-    
+        products = []
     return render(request, 'wishlist.html', {'products': products})
+
+@require_POST
+def add_review(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    rating = int(request.POST.get('rating', 5))
+    comment = request.POST.get('comment', '').strip()
+    if not comment:
+        return JsonResponse({'error': 'Comment cannot be empty.'}, status=400)
+    user = request.user if request.user.is_authenticated else None
+    review = Review.objects.create(product=product, rating=rating, comment=comment, user=user)
+    
+    data = {
+        'review': {
+            'user': review.user.fullname if review.user else 'Anonymous',
+            'rating': review.rating,
+            'comment': review.comment,
+            'created_at': review.created_at.strftime('%Y-%m-%d %H:%M'),
+        }
+    }
+    return JsonResponse(data)
 
 
 def blog_details(request, id):

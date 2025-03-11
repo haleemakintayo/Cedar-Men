@@ -39,10 +39,10 @@
                                     {% for product in products %}
                                     <tr>
                                         <td class="product-remove">
-                                            <a href="{% url 'remove_from_wishlist' product.slug %}">
+                                            <a href="{% url 'remove_from_wishlist' product.slug %}" class="remove-wishlist-item">
                                                 <i class="fa fa-times"></i>
                                             </a>
-                                        </td>
+                                        </td>                                        
                                         <td class="product-thumbnail">
                                             <a href="{{ product.get_url }}">
                                                 <img class="wishlist-thumbnail" src="{{ product.image.url }}" alt="{{ product.name }}">
@@ -68,5 +68,53 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          // Handler for wishlist removal via AJAX
+          $(document).on('click', '.remove-wishlist-item', function(e){
+              e.preventDefault();
+              var link = $(this);
+              var url = link.attr('href');
+              
+              $.ajax({
+                  url: url,
+                  type: "POST",
+                  data: {
+                      'csrfmiddlewaretoken': '{{ csrf_token }}'
+                  },
+                  success: function(response) {
+                      if(response.success){
+                          // Optionally, remove the item row from the DOM.
+                          // If your wishlist items are in table rows:
+                          link.closest('tr').fadeOut(function(){
+                              $(this).remove();
+                          });
+                          
+                          var messageHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                                              '<strong>Success!</strong> ' + response.message +
+                                              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                              '</div>';
+                          $("#messages").html(messageHtml);
+                      } else {
+                          var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                              '<strong>Error!</strong> ' + response.message +
+                                              '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                              '</div>';
+                          $("#messages").html(messageHtml);
+                      }
+                  },
+                  error: function(xhr) {
+                      var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                          '<strong>Error!</strong> ' + xhr.responseText +
+                                          '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                          '</div>';
+                      $("#messages").html(messageHtml);
+                  }
+              });
+          });
+        });
+        </script>
+        
     <!-- wishlist area end -->
 {% endblock %}

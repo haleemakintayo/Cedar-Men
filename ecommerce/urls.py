@@ -8,7 +8,9 @@ from .views import (
 
     product_details,contact_us,
 
-    product_details,checkout,wishlist,add_to_wishlist,remove_from_wishlist
+    product_details,checkout,wishlist,
+    add_to_wishlist,remove_from_wishlist,
+    add_review
 
 
     )
@@ -22,7 +24,8 @@ urlpatterns = [
     path('blog/<int:id>/', blog_details, name='blog_details'),  
     path('product/<slug:slug>/', product_details, name='product_detail'),
     path('add/<slug:product_slug>/', add_to_wishlist, name='add_to_wishlist'),
-     path('remove/<slug:product_slug>/', remove_from_wishlist, name='remove_from_wishlist'),
+    path('remove/<slug:product_slug>/', remove_from_wishlist, name='remove_from_wishlist'),
+    path('product/<slug:product_slug>/add-review/', add_review, name='add_review'),
 
     path('contact_us/', contact_us, name='contact_us'),
 

@@ -46,7 +46,7 @@
                     <div class="shop-style-all">
                         <div class="grid row">
                             {% for product in products|slice:":4" %}
-                                <div class="col-lg-3 col-md-6 col-sm-6 col-12 grid-item cat1">
+                                <div class="col-lg-3 col-md-6 col-sm-6 col-6 grid-item cat1">
                                     <div class="shop hover-style mb-30">
                                         <div class="shop-img">
                                             
@@ -55,14 +55,14 @@
                                             </a>    
                                             <div class="shop-title title-style-1">
                                                 <h3><a href="{{ product.get_url }}">{{ product.name }}</a></h3>
-                                                <span class="new-price">${{ product.price }}</span>
-                                                <span class="old-price">${{ product.old_price }}</span>
+                                                <span class="new-price">£{{ product.price }}</span>
+                                                <span class="old-price">£{{ product.old_price }}</span>
                                             </div>
                                             <div class="product-cart">
                                                 <a href="{{ product.get_url }}"><i class="pe-7s-cart"></i></a>
                                             </div>
                                             <div class="product-wishlist">
-                                                <a href="{% url 'add_to_wishlist' product.slug %}"><i class="fa fa-heart"></i></a>
+                                                <a href="{% url 'add_to_wishlist' product.slug %}" class="add-to-wishlist"><i class="fa fa-heart"></i></a>
                                             </div>  
                                         </div>                          
                                     </div>
@@ -83,7 +83,7 @@
                     <div class="banner-img">
                         <img data-aos="zoom-in" data-aos-duration="2000"
                         data-aos-delay="100"
-                         src="{% static 'assets/img/banner/cedar11.png' %}" alt="">
+                         src="{% static 'assets/img/banner/cedar.jpg' %}" alt="">
                     </div>
                 </div>
             </div>
@@ -104,8 +104,8 @@
                                     </a>
                                     <div class="blog-title">
                                         <span>{{ blog.publish_date|date:"F j, Y" }}</span>
-                                        <h3><a href="{% url 'blog_details' blog.id %}">{{ blog.title }}</a></h3>
-                                        <a href="{% url 'blog_details' blog.id %}">read more</a>
+                                        <h3><a href="{% url 'blog'  %}">{{ blog.title }}</a></h3>
+                                        <a href="{% url 'blog' %}">read more</a>
                                     </div>
                                 </div>
                             </div>
@@ -124,4 +124,44 @@
 
 
             <!-- blog area end -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                $(document).ready(function(){
+                  // Delegate click event for add-to-wishlist links
+                  $(document).off('click', '.add-to-wishlist').on('click', '.add-to-wishlist', function(e) {
+                      e.preventDefault(); // Cancel the default navigation
+                      e.stopPropagation();
+                      var url = $(this).attr('href');
+                      
+                      $.ajax({
+                            url: url,
+                            type: "POST",
+                            dataType: "json",  
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                var alertType = response.success ? 'success' : 'danger';
+                                var messageHtml = '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
+                                                response.message +
+                                                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                '</div>';
+                                $("#messages").html(messageHtml);
+                            },
+                            error: function(xhr) {
+                                var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                                xhr.responseText +
+                                                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                                '</div>';
+                                $("#messages").html(messageHtml);
+                            }
+                        });
+
+                      return false; // Ensures no further action
+                  });
+                });
+                </script>
+                
+                
+                
             {% endblock %}

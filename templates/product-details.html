@@ -118,7 +118,7 @@
                     <!-- Useful Links -->
                     <ul class="usefull-link section">
                         <li><a href="#"><i class="pe-7s-mail"></i> Email to a Friend</a></li>
-                        <li><a href="#"><i class="pe-7s-like"></i> Wishlist</a></li>
+                        <li><a href="{% url 'add_to_wishlist' product.slug %}"><i class="pe-7s-like add-to-wishlist"></i> Wishlist</a></li>
                         <li><a href="#"><i class="pe-7s-print"></i> Print</a></li>
                     </ul>
                     <!-- Share Icons -->
@@ -170,8 +170,52 @@
                     </table>
                 </div>
                 <div class="pro-info-tab tab-pane" id="reviews">
-                    <a href="#">Be the first to write your review!</a>
-                </div>
+                    <!-- Existing Reviews List -->
+                    <div id="review-list">
+                      {% for review in product.reviews.all %}
+                        <div class="review-item" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                          <strong>{{ review.user.username|default:"Anonymous" }}</strong>
+                          <span>Rating: {{ review.rating }} / 5</span>
+                          <p>{{ review.comment }}</p>
+                          <small>{{ review.created_at|date:"Y-m-d H:i" }}</small>
+                        </div>
+                      {% empty %}
+                        <p>Be the first to write your review!</p>
+                      {% endfor %}
+                    </div>
+                    <hr>
+                    <!-- Review Form -->
+                    <h4>Add a Review</h4>
+                    <form id="review-form" method="post" action="{% url 'add_review' product.slug %}">
+                        {% csrf_token %}
+                        
+                        <!-- Star Rating Widget -->
+                        <div class="mb-3">
+                          <label class="form-label">Rating:</label>
+                          <div class="ratting float-right rating-widget">
+                            <i class="fa fa-star" data-value="1"></i>
+                            <i class="fa fa-star" data-value="2"></i>
+                            <i class="fa fa-star" data-value="3"></i>
+                            <i class="fa fa-star" data-value="4"></i>
+                            <i class="fa fa-star" data-value="5"></i>
+                            <span id="review-count"> (Customer Reviews)</span>
+                          </div>
+                          <!-- Hidden input to store the rating value -->
+                          <input type="hidden" name="rating" id="rating-value" value="3">
+                        </div>
+                        
+                        <!-- Review Comment -->
+                        <div class="mb-3">
+                          <label for="comment" class="form-label">Review:</label>
+                          <textarea name="comment" id="comment" rows="4" class="form-control"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                      </form>
+                      
+                      
+                  </div>
+                  
             </div>
         </div>
     </div>
@@ -180,7 +224,9 @@
 
 <!-- jQuery for AJAX functionality -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/coreui@0.4.2-alpha2/lib/index.min.js"></script>
+<script>   
+// Color input code 
 document.addEventListener('DOMContentLoaded', function() {
     // Handle color selection: update active class and hidden input.
         const colorButtons = document.querySelectorAll('.color-list button');
@@ -236,5 +282,159 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
 });
+</script>   
+
+<script>
+    //ADD TO WISHLIST FUNCTION
+    $(document).ready(function(){
+      // Delegate click event for add-to-wishlist links
+      $(document).on('click', '.add-to-wishlist', function(e){
+          e.preventDefault(); // Cancel the default navigation
+          var url = $(this).attr('href');
+          
+          $.ajax({
+              url: url,
+              type: "POST",
+              data: {
+                  'csrfmiddlewaretoken': '{{ csrf_token }}'
+              },
+              success: function(response) {
+                  var alertType = response.success ? 'success' : 'danger';
+                  var messageHtml = '<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert">' +
+                                      '<strong>' + (response.success ? 'Success!' : 'Error!') + '</strong> ' + response.message +
+                                      '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                      '</div>';
+                  $("#messages").html(messageHtml);
+              },
+              error: function(xhr) {
+                  var messageHtml = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                                      '<strong>Error!</strong> ' + xhr.responseText +
+                                      '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                      '</div>';
+                  $("#messages").html(messageHtml);
+              }
+          });
+          return false; // Ensures no further action
+      });
+    });
+    </script>
+    
+
+<script>
+
+//review script
+
+
+$(document).ready(function() {
+  // Initialize current rating from hidden input (default is 3)
+  var currentRating = parseInt($('#rating-value').val()) || 0;
+
+  // Function to update star classes based on a given rating value
+  function updateStars(rating) {
+    $('.rating-widget i').each(function() {
+      var starVal = $(this).data('value');
+      if (starVal <= rating) {
+        $(this).addClass('active');
+      } else {
+        $(this).removeClass('active');
+      }
+    });
+  }
+
+  // Set initial state
+  updateStars(currentRating);
+
+  // On mouseenter: highlight stars up to hovered star
+  $('.rating-widget i').on('mouseenter', function() {
+    var hoverRating = $(this).data('value');
+    updateStars(hoverRating);
+  });
+
+  // On mouseleave: revert stars to the currently selected rating
+  $('.rating-widget').on('mouseleave', function() {
+    updateStars(currentRating);
+  });
+
+  // On click: update the current rating and the hidden input
+  $('.rating-widget i').on('click', function() {
+    currentRating = $(this).data('value');
+    $('#rating-value').val(currentRating);
+    updateStars(currentRating);
+  });
+});
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const myRatingCustomFeedback = document.getElementById('myRatingCustomFeedback');
+  const myRatingCustomFeedbackStart = document.getElementById('myRatingCustomFeedbackStart');
+  const myRatingCustomFeedbackEnd = document.getElementById('myRatingCustomFeedbackEnd');
+  const ratingValueInput = document.getElementById('rating-value');
+  
+  if (myRatingCustomFeedback) {
+    let currentValue = 3;
+    const labels = {
+      1: 'Bad',
+      2: 'Not Good',
+      3: 'Meh',
+      4: 'Good',
+      5: 'Excellent'
+    };
+    const optionsCustomFeedback = {
+      value: currentValue
+    };
+
+
+    new bootstrap.Rating(myRatingCustomFeedback, optionsCustomFeedback);
+
+    // Update the rating on change
+    myRatingCustomFeedback.addEventListener('change.bs.rating', event => {
+      currentValue = event.value;
+      myRatingCustomFeedbackStart.innerHTML = `${event.value} / 5`;
+      myRatingCustomFeedbackEnd.innerHTML = labels[event.value];
+      ratingValueInput.value = event.value;
+    });
+
+    // Update the label on hover
+    myRatingCustomFeedback.addEventListener('hover.bs.rating', event => {
+      myRatingCustomFeedbackEnd.innerHTML = event.value ? labels[event.value] : labels[currentValue];
+    });
+  }
+});
+
+
+
+
+$(document).ready(function(){
+  $('#review-form').on('submit', function(e){
+      e.preventDefault(); 
+      var formData = $(this).serialize(); 
+      $.ajax({
+         url: $(this).attr('action'),
+         method: "POST",
+         data: formData,
+         success: function(response) {
+            // HTML for the new review
+            var review = response.review;
+            var newReviewHtml = '<div class="review-item" style="border-bottom: 1px solid #ddd; padding: 10px 0;">' +
+              '<strong>' + review.user + '</strong> ' +
+              '<span>Rating: ' + review.rating + ' / 5</span>' +
+              '<p>' + review.comment + '</p>' +
+              '<small>' + review.created_at + '</small>' +
+              '</div>';
+            
+            $('#review-list').append(newReviewHtml);
+            
+            $('#review-form')[0].reset();
+         },
+         error: function(xhr) {
+            alert("Error submitting review: " + xhr.responseText);
+         }
+      });
+  });
+});
 </script>
+
+
 {% endblock %}

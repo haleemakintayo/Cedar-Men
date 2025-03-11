@@ -48,11 +48,11 @@
                                                     {% if item.size %}<br>Size: {{ item.size.label }}{% endif %}
                                                     {% if item.color %}<br>Color: <span style="background-color:{{ item.color.hex_code }}; padding: 3px 8px;"></span>{% endif %}
                                                 </td>
-                                                <td class="product-price"><span class="amount">$ {{ item.product.price }}</span></td>
+                                                <td class="product-price"><span class="amount">£ {{ item.product.price }}</span></td>
                                                 <td class="product-quantity">
                                                     <input value="{{ item.quantity }}" type="number" min="1" class="item-quantity">
                                                 </td>
-                                                <td class="product-subtotal">$ {{ item.subtotal|floatformat:2 }}</td>
+                                                <td class="product-subtotal">£ {{ item.subtotal|floatformat:2 }}</td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -76,8 +76,8 @@
                                         <div class="cart-total">
                                             <h2>Cart totals</h2>
                                             <ul>
-                                                <li>Subtotal <span id="cart-total">$ {{ cart.total_price|floatformat:2 }}</span></li>
-                                                <li>Total <span id="cart-total">$ {{ cart.total_price|floatformat:2 }}</span></li>
+                                                <li>Subtotal <span id="cart-total">£ {{ cart.total_price|floatformat:2 }}</span></li>
+                                                <li>Total <span id="cart-total">£ {{ cart.total_price|floatformat:2 }}</span></li>
                                             </ul>
                                             <a href="{% url 'checkout' %}">Proceed to checkout</a>
                                         </div>
@@ -107,9 +107,9 @@
                         },
                         success: function(response){
                             // Update the subtotal cell in this row
-                            row.find('.product-subtotal').text("$" + response.subtotal.toFixed(2));
+                            row.find('.product-subtotal').text("£" + response.subtotal.toFixed(2));
                             // Update the cart total display
-                            $('#cart-total').text("$" + response.total.toFixed(2));
+                            $('#cart-total').text("£" + response.total.toFixed(2));
                         },
                         error: function(xhr){
                             alert("Error updating item: " + xhr.responseText);
@@ -133,7 +133,7 @@
                             // Remove the row from the table
                             row.remove();
                             // Update the cart total display
-                            $('#cart-total').text("$" + response.total.toFixed(2));
+                            $('#cart-total').text("£" + response.total.toFixed(2));
                         },
                         error: function(xhr){
                             alert("Error removing item: " + xhr.responseText);
