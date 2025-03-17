@@ -3,6 +3,7 @@ from django.contrib.auth.models import  UserManager, AbstractBaseUser, Permissio
 from model_utils import FieldTracker
 from django.utils import timezone
 from django.contrib.auth.models import Group
+from phonenumber_field.modelfields import PhoneNumberField
 
 # Create your models here.
 
@@ -49,16 +50,18 @@ class User(AbstractBaseUser, PermissionsMixin):
   ]
 
   email = models.EmailField(blank=True, default='', unique=True)
-  fullname = models.CharField(max_length=50, blank=True)
+  fullname = models.CharField(max_length=225, blank=True, null=True)
+  phone_number=PhoneNumberField(unique=True, blank=True, null=True, region="GB") # Change region as needed
   user_status = models.CharField(max_length=20, choices=USER_CHOICES_FIELD, default='customers')
   password1 = models.CharField(max_length=20, null=True)
   password2 = models.CharField(max_length=20, null=True)
   tracker=FieldTracker(fields=['user_status'])
-  profile_picture=models.ImageField(upload_to='staff_images/', blank=True, null=True)
+  profile_picture=models.ImageField(upload_to='staff_images/', default="staff_images/blank_user_profile.png", blank=True, null=True)
 
   is_active = models.BooleanField(default=True)
   is_superuser = models.BooleanField(default=False)
   is_staff = models.BooleanField(default=False)
+  force_password_change = models.BooleanField(default=False)
 
   date_joined = models.DateTimeField(default=timezone.now)
   last_login = models.DateTimeField(blank=True, null=True)
@@ -73,6 +76,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     verbose_name = 'User'
     verbose_name_plural = 'Users'
 
+  def __str__(self):
+    return self.fullname or self.email
+
   def save(self, *args, **kwargs): 
     # First save the user instance 
     is_new = self.pk is None
@@ -86,5 +92,16 @@ class User(AbstractBaseUser, PermissionsMixin):
       group, _ = Group.objects.get_or_create(name=self.user_status)
       self.groups.add(group)
 
-  def get_full_name(self):
-    return self.fullname or self.email.split('@'[0])
+  def get_name(self):
+    """Returns the middle name if available, otherwise returns the only name present."""
+    if not self.fullname: 
+      return ""
+    
+    name_parts = self.fullname.split()
+
+    if len(name_parts) == 1 or len(name_parts) == 2: 
+      return name_parts[0]
+    if len(name_parts) >= 3:
+      return name_parts[1]
+    
+    return ""

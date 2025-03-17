@@ -2,6 +2,25 @@
 <div class="container mt-4">
   <h2 class="mb-3">Orders</h2>
 
+  <form
+    method="GET"
+    class="d-flex justify-content-center align-items-center gap-2 mt-3"
+  >
+    <div class="input-group shadow-sm" style="max-width: 400px">
+      <input
+        type="text"
+        name="q"
+        class="form-control border-primary rounded-start"
+        placeholder="Search Orders by Customer Name..."
+        value="{{ query }}"
+        aria-label="Search"
+      />
+      <button type="submit" class="btn btn-primary rounded-end">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </form>
+
   <table class="table table-bordered">
     <thead class="thead-dark">
       <tr>
@@ -38,14 +57,14 @@
   </table>
 
   <!-- Pagination Controls -->
-  <!-- <nav aria-label="Invoice Pagination">
+  <nav aria-label="Invoice Pagination">
     <ul class="pagination justify-content-center">
-      {% if invoice.has_previous %}
+      {% if order.has_previous %}
       <li class="page-item">
         <a class="page-link" href="?page=1">First</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ invoice.previous_page_number }}"
+        <a class="page-link" href="?page={{ order.previous_page_number }}"
           >Previous</a
         >
       </li>
@@ -53,23 +72,21 @@
 
       <li class="page-item active">
         <span class="page-link">
-          Page {{ invoice.number }} of {{ invoice.paginator.num_pages }}
+          Page {{ order.number }} of {{ order.paginator.num_pages }}
         </span>
       </li>
 
-      {% if invoice.has_next %}
+      {% if order.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ invoice.next_page_number }}"
-          >Next</a
-        >
+        <a class="page-link" href="?page={{ order.next_page_number }}">Next</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ invoice.paginator.num_pages }}"
+        <a class="page-link" href="?page={{ order.paginator.num_pages }}"
           >Last</a
         >
       </li>
       {% endif %}
     </ul>
-  </nav> -->
+  </nav>
 </div>
 {% endblock %}

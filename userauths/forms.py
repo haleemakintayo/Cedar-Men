@@ -3,6 +3,7 @@ from django import forms
 from .models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import SetPasswordForm
 
 class UserForm(ModelForm):
   class Meta: 
@@ -10,7 +11,7 @@ class UserForm(ModelForm):
     fields = [
       "fullname", 
       "email", 
-      "user_status",
+      "phone_number",
       "password1", 
       "password2",
     ]
@@ -24,6 +25,10 @@ class UserForm(ModelForm):
         'placeholder': "Email",
         'class': 'form-control',
       }),
+      'phone_number': forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter Phone Number',
+      }),
       "password1": forms.PasswordInput(attrs={
         'placeholder': 'Password',
         'class': 'form-control',
@@ -35,20 +40,20 @@ class UserForm(ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
-    show_user_status = kwargs.pop("show_user_status", False)
+    self.request = kwargs.pop('request', None)
+    is_staff_form = kwargs.pop('is_staff_form', False)
     super().__init__(*args, **kwargs)
 
-    if show_user_status: 
-      self.fields["user_status"] = forms.ChoiceField(
-        choices=User.USER_CHOICES_FIELD, 
-        widget=forms.Select(attrs={"class": "form-control"})
-      )
+    if is_staff_form: 
+       self.fields.pop('password1', None)
+       self.fields.pop('password2', None)
 
-    # for field in self.fields.items(): 
-    #   field.widgets.attrs.update({"class": "form-control"})
+    self.is_staff_form = is_staff_form # Store flag for later use
 
   def clean_fullname(self):
     fullname = self.cleaned_data.get('fullname')
+    print("DEBUG: Raw Fullname from Form:", fullname)
+
     if fullname: 
       # Split the name into parts and filter out empty strings
       name_parts = [part.strip() for part in fullname.split() if part.strip()]
@@ -59,6 +64,8 @@ class UserForm(ModelForm):
       
       # Capitalize each part of the name
       fullname = ' '.join(part.capitalize() for part in name_parts)
+
+      print("DEBUG: Cleaned Fullname:", fullname)
 
       return fullname
 
@@ -92,21 +99,30 @@ class UserForm(ModelForm):
     # Stall the save process
     user = super().save(commit=False)
 
-    email = self.cleaned_data['email']
-    password = self.cleaned_data['password1']
-    user_status = self.cleaned_data['user_status']
+    # Ensure all fields are set correctly
+    user.fullname = self.cleaned_data.get("fullname")
+    user.email = self.cleaned_data.get("email")
 
-    if commit and user_status == 'staffs':
-      user = User.objects.create_staff_user(email=email, password=password)
-
-      user.save()
-
+    # Check where the form is submitted from (admin dashboard or frontend)
+    if self.is_staff_form or (self.request and self.request.user.is_staff): 
+        user.user_status = 'staff'  # Admin-created users get 'staff'
     else:
-      user = User.objects.create_user(email=email, password=password)
+        user.user_status = 'customer'  # Frontend users get 'customer'
 
-      user.save()
-    # # Set the password properly to hash it
-    # user.set_password(self.cleaned_data['password1'])
+    # Set password securely
+    if 'password1' in self.cleaned_data: 
+       user.set_password(self.cleaned_data['password1'])
+
+    # Assign staff permissions if the user is a staff member
+    if user.user_status == "staff":
+        user.is_staff = True
+        user.is_superuser = False
+    else:
+        user.is_staff = False  
+
+    if commit:
+        user.save()
+
     return user
 
 # Login form
@@ -128,3 +144,45 @@ class StaffLoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={'class': 'form-control inpout-lg', 'placeholder': 'Enter your password', 'id': 'password'}),
     )
     # account_type = forms.ChoiceField()
+class StaffProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['profile_picture', 'fullname', 'email', 'phone_number']
+
+        widgets = {
+            'fullname': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Fullname',
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Email Address',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Phone Number',
+            }),
+        }
+
+    # Custom styling for the image field
+    profile_picture = forms.ImageField(
+        required=False, 
+        widget=forms.FileInput(attrs={
+            'class': 'form-control-file',
+            'accept': "image/*",  
+        })
+    )
+
+from django import forms
+from django.contrib.auth.forms import PasswordChangeForm
+
+class ChangePasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'})
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'})
+    )

@@ -10,8 +10,13 @@ Fix:
 - Invoice total_price not being calculated. ✅ 
 - Password fields showing to backend operator. Encrypt both password fields. ✅
 - The whole order rendering ✅
-- The filter functionality for product, invoice and order rendering
-- Fix product rending div in frontend (Might have something to do with the ProductForm)
-- user fullname not saving
-- User profile editing and proper staff registration/editing too
-- view-cart hover effect fix 
+- The search functionality for product, invoice and order rendering ✅ 
+- Pagination for order list page ✅ 
+- Fix product rending div in frontend (Might have something to do with the ProductForm) ✅
+- user fullname not saving ✅
+- User profile editing and proper staff registration/editing too ✅
+- landing page fix (animation and the background there) ✅
+- user/staff registration form fix (the landing page) ✅
+- default password for new staff, and change password page. ✅ 
+- Add new staff redirect page and success/error message. ✅
+- After integrations, filter functions for product, invoice and order rendering 

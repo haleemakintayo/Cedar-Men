@@ -2,6 +2,25 @@
 <div class="container mt-4">
   <h2 class="mb-3">Invoices</h2>
 
+  <form
+    method="GET"
+    class="d-flex justify-content-center align-items-center gap-2 mt-3"
+  >
+    <div class="input-group shadow-sm" style="max-width: 400px">
+      <input
+        type="text"
+        name="q"
+        class="form-control border-primary rounded-start"
+        placeholder="Search by Invoice number..."
+        value="{{ query }}"
+        aria-label="Search"
+      />
+      <button type="submit" class="btn btn-primary rounded-end">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </form>
+
   <table class="table table-bordered">
     <thead class="thead-dark">
       <tr>

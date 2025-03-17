@@ -1,18 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth import logout, login, authenticate, update_session_auth_hash
 from django.contrib import messages
-from .forms import UserForm, LoginForm, StaffLoginForm
+from .forms import UserForm, LoginForm, StaffLoginForm, StaffProfileForm, ChangePasswordForm
 from .models import User
 from ecommerce.models import Product, InvoiceItem, Invoice
 from orders.models import Order
 from .utils import staff_required, generate_invoice_number, render_to_pdf
 from django.core.paginator import Paginator
 from ecommerce.forms import ProductForm, InvoiceItemForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse
 
 # Add your views here:
- 
+
+# Test cases: 
+def is_admin(user):
+  return user.is_superuser or user.has_perm('auth.view_user')
+
 def login_view(request):
   if request.user.is_authenticated: 
     return redirect('home') # Redirect if already logged in 
@@ -43,7 +47,7 @@ def login_view(request):
 
 def register(request):
   if request.method == 'POST': 
-    form = UserForm(request.POST)
+    form = UserForm(request.POST, request=request)
     if form.is_valid():
       user = form.save()
 
@@ -56,35 +60,27 @@ def register(request):
         login(request, user)
         return redirect('home')
   else: 
-    form = UserForm()
+    form = UserForm(request=request)
   return render(request, 'register.html', {'form':form})
 
-def register_staff(request):
-  if request.method == 'POST': 
-    form = UserForm(request.POST, show_user_status=True)
-    if form.is_valid():
-      form.save()
-  else: 
-    form = UserForm(show_user_status=True)
-
-  return render(request, 'theme/add_staff.html',{'form':form})
     
 def logout_view(request): 
-  logout(request) # Logs the user out
-  return redirect('login') # Redirect to the Login page
+  if request.user.is_authenticated: 
+    is_staff = request.user.is_staff
+
+    logout(request)
+
+    if is_staff: 
+      return redirect('login-admin')
+    
+  return redirect('login')
 
 # Admin and Staffs:
 @staff_required
 def dashboard_admin(request):
   user = request.user
-  names = user.fullname.split(' ')
 
-  if len(names) > 1:
-    middlename = names[1];
-  else: 
-    middlename = 'Anonymous'
-
-  return render(request, 'theme/index.html', {'middlename': middlename})
+  return render(request, 'theme/index.html')
 
 def register_admin(request):
   return render(request, 'theme/sign-up.html')
@@ -93,41 +89,86 @@ def dashboard_breadcrumb(request):
   return render(request, 'theme/breadcrumb.html')
 
 # Login admin
+from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import StaffLoginForm
+from .models import User
+
 def login_admin(request):
-  if request.method == "POST":
-    form = StaffLoginForm(request.POST)
-    if form.is_valid():
-      email = form.cleaned_data['email']
-      password = form.cleaned_data['password']
+    if request.method == "POST":
+        form = StaffLoginForm(request.POST)
+        
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
 
-      # Find the user by email
-      try: 
-        user = User.objects.get(email=email)
-      except User.DoesNotExist: 
-        user = None
+            # Find the user by email
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
 
-      # Authenticate using email instead of username: 
-      if user is not None and user.is_staff and user.check_password(password): 
-        login(request, user)
-        messages.success(request, "Login successful!")
-        return redirect('admin-dashboard') # Redirect to dashboard after logging in. 
-      else: 
-        messages.error(request, "Invalid email or password.")
-  else: 
-    form = StaffLoginForm()
+            # Authenticate using email instead of username
+            if user is not None and user.is_staff and user.check_password(password):
+                login(request, user)
 
-  return render(request, 'theme/sign-in.html', {'form':form})
+                if user.force_password_change:
+                    return redirect('change-password')
+                
+                return redirect('admin-dashboard')  # Redirect to dashboard after logging in.
+            else:
+                form.add_error(None, "Invalid email or password.")  # Add non-field error
+        else:
+            messages.error(request, "Please correct the errors below.")  # Generic error message
 
+    else:
+        form = StaffLoginForm()
+
+    return render(request, 'theme/sign-in.html', {'form': form})
+
+
+@login_required
+def change_password(request):
+    user = request.user
+    
+    if request.method == "POST":
+        form = ChangePasswordForm(user, request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data["new_password1"]  # Corrected syntax
+            user.set_password(new_password)  # Update password
+            user.force_password_change = False  # Mark password as changed
+            print("Form submitted")
+            print(f"User Status Before Save: {user.force_password_change}")
+            user.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            
+            messages.success(request, "Your password has been successfully updated.")
+            return redirect("admin-dashboard")  # Ensure this URL exists
+        
+        else:  # Debug why the form is failing
+            print(form.errors)  # Logs errors in the terminal
+            messages.error(request, "Please correct the errors below.")
+    
+    else:
+        form = ChangePasswordForm(user)
+
+    return render(request, "theme/change_password.html", {"form": form})
 # Product management: 
 def dashboard_products(request):
-  product_queryset = Product.objects.all().order_by('-created_at') # Get all products, newest first. 
+  product_queryset = Product.objects.all().order_by('-created_at') # Get all products, newest first.
+
+  query = request.GET.get("q", "")
   
+  if query: 
+    product_queryset = product_queryset.filter(name__icontains=query) # Search by product name
+
   # Paginate with 10 products per page: 
   paginator = Paginator(product_queryset, 10)
   page_number = request.GET.get('page') # Get page number from URL
   products = paginator.get_page(page_number) # Get paginated products
 
-  return render(request, 'theme/products.html', {'products': products}) 
+  return render(request, 'theme/products.html', {'products': products, "query": query}) 
 
 def create_product(request):
   if request.method == 'POST':
@@ -163,6 +204,7 @@ def delete_products(request, product_id):
   messages.success(request, "Product deleted sucessfully!")
 
   return redirect('dashboard-products')
+
 
 ##################### Invoice views:
 def generate_invoice(request, order_id):
@@ -205,16 +247,21 @@ def view_invoice_admin(request, invoice_id):
 @login_required
 def invoice_list(request):
   if request.user.is_staff:
-    invoices = Invoice.objects.all(). order_by('-created_at')
+    invoices = Invoice.objects.all().order_by('-created_at')
   else: 
     invoices = Invoice.objects.filter(user=request.user).order_by('-created_at')
+
+  query = request.GET.get("q", "")
+
+  if query: 
+    invoices = invoices.filter(invoice_number__icontains=query)
 
   # Paginate with 10 products per page:  
   paginator = Paginator(invoices, 10)
   page_number = request.GET.get('page') # Get page number from URL
   invoice = paginator.get_page(page_number) # Get paginated products
 
-  return render(request, 'theme/invoice_list.html', {'invoice': invoice, 'invoices': invoices}) 
+  return render(request, 'theme/invoice_list.html', {'invoice': invoice, 'invoices': invoices, "query": query}) 
 
 def download_invoice_pdf(request, invoice_id):
   invoice = get_object_or_404(Invoice, id=invoice_id, user=request.user)
@@ -242,23 +289,75 @@ def download_invoice_pdf(request, invoice_id):
 @login_required 
 def order_list(request):
   orders = Order.objects.all().order_by('-created_at')
-  return render(request, "theme/order_list.html", {"orders": orders})
 
+  query = request.GET.get("q", "")
+
+  if query:
+    orders = orders.filter(customer__fullname__icontains=query) 
+
+  # Paginate with 10 products per page:
+  paginator = Paginator(orders, 10)
+  page_number = request.GET.get('page')
+  order = paginator.get_page(page_number)
+
+  return render(request, 'theme/order_list.html', {'query':query, 'orders': orders, 'order': order})
+
+def staff_list(request):
+  users = User.objects.all()
+  staff_queryset = users.filter(is_staff=True).order_by('-date_joined')
+
+  query = request.GET.get("q", "")
   
-# @login_required 
-# def edit_invoice(request, invoice_id):
-#   invoice = get_object_or_404(Invoice, id=invoice_id)
-#   items = InvoiceItem.objects.filter(invoice=invoice)
+  if query: 
+    staff_queryset = staff_queryset.filter(fullname__icontains=query) # Search by product name
 
-#   if request.method == "POST": 
-#     form = InvoiceItemForm(request.POST)
-#     if form.is_valid():
-#       item = form.save(commit=False)
-#       item.invoice = invoice
-#       item.save()
-#       invoice.calculate_total() # Recalculate total amount
-#       return redirect("edit-invoice", invoice_id=invoice.id)
-#   else: 
-#     form = InvoiceItemForm()
+  # Paginate with 10 products per page: 
+  paginator = Paginator(staff_queryset, 10)
+  page_number = request.GET.get('page') # Get page number from URL
+  staffs = paginator.get_page(page_number) # Get paginated products
 
-#   return render(request, "theme/edit_invoice.html", {"invoice": invoice, "items": items, "form": form})
+  return render(request, 'theme/staff_list.html', {'staffs': staffs, "query": query}) 
+
+@login_required
+@user_passes_test(is_admin)
+def staff_detail_view(request, staff_id):
+  staff = get_object_or_404(User, id=staff_id, is_staff=True)
+
+  return render(request, 'theme/staff_detail.html', {'staff': staff})
+
+@login_required
+def edit_staff_profile(request):
+  staff = request.user
+
+  if request.method == "POST":
+    form = StaffProfileForm(request.POST, request.FILES, instance=staff)
+    if form.is_valid():
+      form.save()
+      return redirect("admin-dashboard")
+  else:
+    form = StaffProfileForm(instance=staff)
+
+  return render(request, "theme/edit_profile.html", {'form': form, 'staff': staff}) 
+
+def register_staff(request):
+  if request.method == 'POST': 
+    form = UserForm(request.POST or None, request=request, is_staff_form=True)
+    if form.is_valid():
+      staff = form.save(commit=False)
+      staff.set_password("Staff@1234")
+      staff.user_status = 'staff'
+      staff.is_staff = True
+      staff.force_password_change = True
+      staff.save()
+      return redirect('staff-list')
+  else: 
+    form = UserForm(request=request, is_staff_form=True)
+
+  return render(request, 'theme/add_staff.html',{'form':form})
+
+def delete_staff(request, staff_id):
+  staff = get_object_or_404(User, id=staff_id)
+  staff.delete()
+  messages.success(request, "Staff deleted sucessfully!")
+
+  return redirect('staff-list')

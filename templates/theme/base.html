@@ -70,6 +70,62 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="{% static 'assets/assets/plugins/nprogress/nprogress.js' %}"></script>
+    <style>
+      .profile-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%; /* Makes it round */
+        object-fit: cover; /* Ensures proper cropping */
+        border: 3px solid #ddd;
+      }
+      .profile-container {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .form-card {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      .profile-picture-edit {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ddd;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+        position: relative;
+      }
+
+      /* Zoom effect on hover */
+      .profile-picture-label:hover .profile-picture-edit {
+        transform: scale(1.1); /* Slight zoom */
+      }
+
+      /* Overlay text effect */
+      .profile-overlay {
+        position: absolute;
+        top: 37%;
+        left: 58.5%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      /* Show overlay text on hover */
+      .profile-picture-label:hover .profile-overlay {
+        opacity: 1;
+      }
+    </style>
   </head>
 
   <body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
@@ -164,7 +220,7 @@
                   aria-expanded="false"
                   aria-controls="products"
                 >
-                  <i class="mdi mdi-dropbox"></i>
+                  <i class="mdi mdi-tag-outline"></i>
                   <span class="nav-text">Products</span>
                 </a>
               </li>
@@ -176,7 +232,7 @@
                   aria-expanded="false"
                   aria-controls="products"
                 >
-                  <i class="mdi mdi-dropbox"></i>
+                  <i class="mdi mdi-cart-outline"></i>
                   <span class="nav-text">Orders</span>
                 </a>
               </li>
@@ -188,7 +244,7 @@
                   aria-expanded="false"
                   aria-controls="products"
                 >
-                  <i class="mdi mdi-dropbox"></i>
+                  <i class="mdi mdi-receipt"></i>
                   <span class="nav-text">Invoice</span>
                 </a>
               </li>
@@ -196,12 +252,12 @@
               <li class="has-sub active expand">
                 <a
                   class="sidenav-item-link"
-                  href="{% url 'add-staff' %}"
+                  href="{% url 'staff-list' %}"
                   aria-expanded="false"
                   aria-controls="products"
                 >
-                  <i class="mdi mdi-dropbox"></i>
-                  <span class="nav-text">Add New Staff</span>
+                  <i class="mdi mdi-account-multiple"></i>
+                  <span class="nav-text">Staffs</span>
                 </a>
               </li>
             </ul>
@@ -1056,27 +1112,51 @@
                   <i class="mdi mdi-settings mdi-spin"></i>
                 </li>
                 <!-- User Account -->
+                <!-- User dropdown area -->
                 <li class="dropdown user-menu">
                   <button
-                    href="{% url 'login-admin' %}"
+                    href="#"
                     class="dropdown-toggle nav-link"
                     data-toggle="dropdown"
                   >
+                    {% if user.is_authenticated %}
                     <img
-                      src="{% static 'assets/assets/img/user/user.png' %}"
+                      src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/assets/img/user/blank_user_profile.png' %}{% endif %}"
                       class="user-image"
                       alt="User Image"
                     />
-                    {% if user.is_authenticated %}
                     <span class="d-none d-lg-inline-block"
-                      >Welcome, {{ middlename }}</span
+                      >Welcome, {{ request.user.get_name }}</span
                     >
-                    {% else %}
-                    <span class="d-none d-lg-inline-block">Login Here</span>
-                    {% endif %}
                   </button>
+                  <ul class="dropdown-menu dropdown-menu-right">
+                    <!-- User image -->
+
+                    <li class="dropdown-header">
+                      <img
+                        src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'assets/assets/img/user/blank_user_profile.png' %}{% endif %}"
+                        class="img-circle"
+                        alt="User Image"
+                      />
+                      <div class="d-inline-block">
+                        {{ user.get_name }}
+                        <small class="pt-1">{{ user.email }}</small>
+                      </div>
+                    </li>
+
+                    <li>
+                      <a href="{% url 'edit-profile' %}">
+                        <i class="mdi mdi-account"></i> My Profile
+                      </a>
+                    </li>
+                    <li class="dropdown-footer">
+                      <a href="{% url 'logout' %}">
+                        <i class="mdi mdi-logout"></i> Log Out
+                      </a>
+                    </li>
+                  </ul>
                 </li>
-                <!-- 
+                {% else %}
                 <li class="dropdown user-menu">
                   <button
                     href="#"
@@ -1084,54 +1164,40 @@
                     data-toggle="dropdown"
                   >
                     <img
-                      src="{% static 'assets/assets/img/user/user.png' %}"
+                      src="{% static 'assets/assets/img/user/blank_user_profile.png' %}"
                       class="user-image"
                       alt="User Image"
                     />
-                    <span class="d-none d-lg-inline-block">Abdus Salam</span>
+                    <span class="d-none d-lg-inline-block">Login Here</span>
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-right"> -->
-                <!-- User image -->
-                <!--  
+                  <ul class="dropdown-menu dropdown-menu-right">
+                    <!-- User image -->
+
                     <li class="dropdown-header">
                       <img
-                        src="{% static 'assets/assets/img/user/user.png' %}"
+                        src="{% static 'assets/assets/img/user/blank_user_profile.png' %}"
                         class="img-circle"
                         alt="User Image"
                       />
                       <div class="d-inline-block">
-                        Abdus Salam
-                        <small class="pt-1">iamabdus@gmail.com</small>
+                        Anonymous
+                        <small class="pt-1">Gmail Here</small>
                       </div>
                     </li>
 
                     <li>
-                      <a href="user-profile.html">
+                      <a href="#">
                         <i class="mdi mdi-account"></i> My Profile
                       </a>
                     </li>
-                    <li>
-                      <a href="#"> <i class="mdi mdi-email"></i> Message </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="mdi mdi-diamond-stone"></i> Projects
-                      </a>
-                    </li>
-                    <li class="right-sidebar-in">
-                      <a href="javascript:0">
-                        <i class="mdi mdi-settings"></i> Setting
-                      </a>
-                    </li>
-
                     <li class="dropdown-footer">
-                      <a href="index.html">
-                        <i class="mdi mdi-logout"></i> Log Out
+                      <a href="{% url 'login-admin' %}">
+                        <i class="mdi mdi-logout"></i> Login
                       </a>
                     </li>
                   </ul>
                 </li>
-                -->
+                {% endif %}
               </ul>
             </div>
           </nav>
@@ -1145,6 +1211,22 @@
           <!-- End Content -->
         </div>
         <!-- End Content Wrapper -->
+
+        <script>
+          document
+            .getElementById("profilePictureInput")
+            .addEventListener("change", function (event) {
+              const file = event.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                  document.getElementById("profilePicturePreview").src =
+                    e.target.result;
+                };
+                reader.readAsDataURL(file);
+              }
+            });
+        </script>
 
         <!-- Footer -->
         <footer class="footer mt-auto">
