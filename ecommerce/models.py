@@ -99,7 +99,7 @@ class Wishlist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Wishlist for {self.user.username}"
+        return f"Wishlist for {self.user.fullname}"
     
     def add_product(self, product):
         """Add a product to the wishlist."""
@@ -125,7 +125,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Review for {self.product.name} by {self.user.username if self.user else 'Anonymous'}"
+        return f"Review for {self.product.name} by {self.user.fullname if self.user else 'Anonymous'}"
   
 
 

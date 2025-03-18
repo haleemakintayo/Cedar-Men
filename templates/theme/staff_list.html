@@ -1,6 +1,6 @@
-{% extends 'theme/base.html' %}{% block content %}
+{% extends 'theme/base.html' %} {% block content %}
 <div class="container mt-5">
-  <h2 class="mb-4">Product List</h2>
+  <h2 class="mb-4">Staff List</h2>
 
   <form
     method="GET"
@@ -11,7 +11,7 @@
         type="text"
         name="q"
         class="form-control border-primary rounded-start"
-        placeholder="Search by Product Name..."
+        placeholder="Search by Staff Name..."
         value="{{ query }}"
         aria-label="Search"
       />
@@ -26,32 +26,30 @@
       <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Category</th>
-        <th>Price</th>
-        <th>Date</th>
+        <th>Email</th>
+        <th>Last login</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      {% for product in products %}
+      {% for staff in staffs %}
       <tr>
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.category }}</td>
-        <td>${{ product.price }}</td>
-        <td>{{ product.created_at }}</td>
+        <td>{{ staff.id }}</td>
+        <td>{{ staff.fullname }}</td>
+        <td>{{ staff.email }}</td>
+        <td>{{ staff.last_login|default:"Never logged in" }}</td>
         <td>
           <a
-            href="{% url 'edit-products' product.id %}"
+            href="{% url 'staff-detail' staff.id %}"
             class="btn btn-sm btn-warning"
-            >Edit</a
+            >View Detail</a
           >
           <!-- Delete Button (Modal for Safety) -->
           <button
             type="button"
             class="btn btn-sm btn-danger check"
             data-bs-toggle="modal"
-            data-bs-target="#deleteModal{{ product.id }}"
+            data-bs-target="#deleteModal{{ staff.id }}"
           >
             Delete
           </button>
@@ -59,7 +57,7 @@
           <!-- Delete Confirmation Modal -->
           <div
             class="modal fade"
-            id="deleteModal{{ product.id }}"
+            id="deleteModal{{ staff.id }}"
             tabindex="-1"
             aria-labelledby="deleteModalLabel"
             aria-hidden="true"
@@ -78,7 +76,7 @@
                   ></button>
                 </div>
                 <div class="modal-body">
-                  Are you sure you want to delete "{{ product.name }}"?
+                  Are you sure you want to delete "{{ staff.fullname }}"?
                 </div>
                 <div class="modal-footer">
                   <button
@@ -89,7 +87,7 @@
                     Cancel
                   </button>
                   <a
-                    href="{% url 'delete-products' product.id %}"
+                    href="{% url 'delete-staff' staff.id %}"
                     class="btn btn-danger"
                     >Delete</a
                   >
@@ -102,7 +100,7 @@
       {% empty %}
 
       <tr>
-        <td colspan="6" class="text-center">No products available</td>
+        <td colspan="6" class="text-center">No staff available</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -111,12 +109,12 @@
   <!-- Pagination Controls -->
   <nav aria-label="Product Pagination">
     <ul class="pagination justify-content-center">
-      {% if products.has_previous %}
+      {% if staffs.has_previous %}
       <li class="page-item">
         <a class="page-link" href="?page=1">First</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ products.previous_page_number }}"
+        <a class="page-link" href="?page={{ staffs.previous_page_number }}"
           >Previous</a
         >
       </li>
@@ -124,18 +122,16 @@
 
       <li class="page-item active">
         <span class="page-link">
-          Page {{ products.number }} of {{ products.paginator.num_pages }}
+          Page {{ staffs.number }} of {{ staffs.paginator.num_pages }}
         </span>
       </li>
 
-      {% if products.has_next %}
+      {% if staffs.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ products.next_page_number }}"
-          >Next</a
-        >
+        <a class="page-link" href="?page={{ staffs.next_page_number }}">Next</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ products.paginator.num_pages }}"
+        <a class="page-link" href="?page={{ staffs.paginator.num_pages }}"
           >Last</a
         >
       </li>
@@ -145,9 +141,7 @@
 
   <!-- Add New Product Button -->
   <div class="text-center mt-3">
-    <a href="{% url 'create-product' %}" class="btn btn-success"
-      >Add New Product</a
-    >
+    <a href="{% url 'add-staff' %}" class="btn btn-success">Add New staff</a>
   </div>
 </div>
 {% endblock %}

@@ -14,11 +14,13 @@ class Cart(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        if self.user:
-            names = self.user.fullname.split(' ')
-            return f"Cart for {names[1]}"
+        if self.user and isinstance(self.user.fullname, str) and self.user.fullname.strip(): 
+            names = self.user.fullname.split() # Auto handles mutiple spaces 
+            if len(names) > 1: 
+                return f"Cart for {names[1]}"
+            return f"Cart for {names[0]}"
         return f"Cart {self.session_key}"
-    
+
     def total_items(self):
         return sum(item.quantity for item in self.items.all())
     

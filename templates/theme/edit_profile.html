@@ -1,0 +1,58 @@
+{% extends 'theme/base.html' %} {% load static %} {% block content %}
+<div class="container mt-5">
+  <h2 class="text-center" style="margin-bottom: 48px">Edit Staff Profile</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="text-center">
+      <!-- Profile Picture Upload -->
+      {% if staff.profile_picture %}
+      <label for="profilePictureInput" class="profile-picture-label">
+        <img
+          id="profilePicturePreview"
+          src="{{ staff.profile_picture.url }}"
+          class="rounded-circle profile-picture-edit"
+          alt="Profile Picture"
+          onerror="this.onerror=null; this.src='{% static 'assets/img/user/blank_user_profile.png' %}'"
+        />
+        <!-- Click Indicator -->
+        <div class="profile-overlay">Click to Change</div>
+      </label>
+      {% else %}
+      <label for="profilePictureInput" class="profile-picture-label">
+        <img
+          id="profilePicturePreview"
+          src="{% static 'assets/assets/img/user/blank_user_profile.png' %}"
+          class="rounded-circle profile-picture-edit"
+          alt="Profile Picture"
+          onerror="this.onerror=null; this.src='{% static 'assets/img/user/blank_user_profile.png' %}'"
+        />
+        <!-- Click Indicator -->
+        <div class="profile-overlay">Click to Change</div>
+      </label>
+      {% endif %}
+      <!-- Hidden File Input -->
+      <input
+        type="file"
+        id="profilePictureInput"
+        name="profile_picture"
+        accept="image/*"
+        class="d-none"
+      />
+    </div>
+
+    <div class="form-group mt-3">
+      {{ form.fullname.label_tag }} {{ form.fullname }}
+    </div>
+
+    <div class="form-group">{{ form.email.label_tag }} {{ form.email }}</div>
+
+    <div class="form-group">
+      {{ form.phone_number.label_tag }} {{ form.phone_number }}
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+  </form>
+  {% endblock %}
+</div>
