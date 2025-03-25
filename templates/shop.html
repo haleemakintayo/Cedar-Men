@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %} 
+{% load static %}
+{% block content %}
 
 <!-- shop area start -->
 <div class="shop-area pt-100 pb-70">
@@ -13,7 +15,7 @@
     <div class="shop-style-all mt-50">
       <div class="grid row">
         {% for product in products|slice:":4" %}
-        <div class="col-lg-3 col-md-6 col-sm-6 col-12 grid-item cat1">
+        <div class="col-lg-3 col-md-6 col-sm-6 col-6 grid-item cat1">
           <div class="shop hover-style mb-30">
             <div class="shop-img-container">
               <a href="{{ product.get_url }}">
