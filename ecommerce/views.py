@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from .models import (
-    Product, Blog,TeamMember,Wishlist,Review
+    Product, Blog,TeamMember,
+    Wishlist,Review,Category
     
     ) 
 
@@ -15,12 +16,13 @@ from django.core.mail import send_mail
 def home(request):
     # Get all products
     products = Product.objects.all()
+    categories = Category.objects.all()
 
     # Get all blogs
     blogs = Blog.objects.all()
 
     # Pass both products and blogs to the template
-    return render(request, 'index.html', {'products': products, 'blogs': blogs})
+    return render(request, 'index.html', {'products': products, 'blogs': blogs, 'categories': categories })
 
 
 def about_us(request):
@@ -30,8 +32,25 @@ def about_us(request):
 
 def shop(request):
     products = Product.objects.all()
+    categories = Category.objects.all()
+
+    context = {
+        'products': products,
+        'categories': categories,
+    }
+    return render(request, 'shop.html', context)
     
-    return render(request, 'shop.html',{'products': products})
+
+def category_products(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    products = Product.objects.filter(category=category)
+    
+    context = {
+        'category': category,
+        'products': products,
+    }
+    return render(request, 'category_products.html', context)
+
 
 def product_details(request, slug):
     product = get_object_or_404(Product, slug=slug)

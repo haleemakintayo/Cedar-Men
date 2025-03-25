@@ -2,6 +2,35 @@
 {% load static %}
 {% block content %}
 
+
+<!-- Categories area start -->
+<div class="categories-area pt-80 pb-50">
+  <div class="container-fluid">
+    <div class="section-title text-center mb-50">
+      <h2>Shop By Category</h2>
+      <p>Explore our curated collections designed for the modern gentleman</p>
+    </div>
+    <div class="row">
+      {% for category in categories %}
+      <div class="col-lg-2 col-md-4 col-sm-6 mb-30">
+        <div class="category-card">
+          <a href="{% url 'category_products' category.slug %}">
+            <div class="category-img-container">
+              <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid">
+              <div class="category-overlay">
+                <h4>{{ category.name }}</h4>
+                <p>{{ category.description|truncatechars:50 }}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- Categories area end -->
+
 <!-- shop area start -->
 <div class="shop-area pt-100 pb-70">
   <div class="container-fluid">
