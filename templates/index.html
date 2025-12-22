@@ -79,7 +79,7 @@
 <!-- shop area end -->
 
 <!-- Categories area start -->
-<div class="categories-area pt-80 pb-50">
+<!-- <div class="categories-area pt-80 pb-50">
     <div class="container-fluid">
       <div class="section-title text-center mb-50">
         <h2>Shop By Category</h2>
@@ -103,7 +103,7 @@
         {% endfor %}
       </div>
     </div>
-  </div>
+  </div> -->
   <!-- Categories area end -->
 <!-- banner area start -->
 <div class="banner-area pb-100">
@@ -124,21 +124,22 @@
             <p>At CedarMen, we are redefining urban fashion with exclusive, high-quality designs that help you dress confidently for every occasion. Our latest collection brings together luxury.</p>
         </div>
         <div class="row">
-            {% for blog in blogs %}
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="single-blog mb-30">
-                        <a href="{% url 'blog' %}"></a>  <!-- Correct for listing all blogs -->
-                            <img src="{{ blog.image.url }}" alt="">
-                        </a>
-                        <div class="blog-title">
-                            <span>{{ blog.publish_date|date:"F j, Y" }}</span>
-                            <h3><a href="{% url 'blog'  %}">{{ blog.title }}</a></h3>
-                            <a href="{% url 'blog' %}">read more</a>
-                        </div>
-                    </div>
+    {% for blog in blogs %}
+        <div class="col-lg-3 col-md-6 col-sm-6 col-6"> <!-- Add col-6 for extra small screens -->
+            <div class="single-blog mb-30">
+                <a href="{% url 'blog' %}">
+                    <img src="{{ blog.image.url }}" alt="">
+                </a>
+                <div class="blog-title">
+                    <span>{{ blog.publish_date|date:"F j, Y" }}</span>
+                    <h3><a href="{% url 'blog' %}">{{ blog.title }}</a></h3>
+                    <a href="{% url 'blog' %}">read more</a>
                 </div>
-            {% endfor %}
+            </div>
         </div>
+    {% endfor %}
+</div>
+
             
     </div>
 </div>
