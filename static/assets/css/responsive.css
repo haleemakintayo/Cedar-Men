@@ -320,8 +320,16 @@
 /* small mobile :320px. */
 @media (max-width: 767px) {
   .logo {
-    width: 200%;
-    margin-left: -50px;
+    width: 100%;
+    margin-left: 0;
+    text-align: center;
+  }
+  .logo img {
+    max-width: 120px;
+    width: auto;
+  }
+  .footer-logo img {
+    max-width: 150px;
   }
 
   .waraper {

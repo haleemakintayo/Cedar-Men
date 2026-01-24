@@ -63,7 +63,8 @@
     color: #999;
 }
 .logo img {
-    width: 100%;
+    max-width: 150px;
+    width: auto;
 }
 /*------------- mobile menu --------------*/
 
