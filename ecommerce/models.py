@@ -82,6 +82,9 @@ class Product(models.Model):
         return reverse("product_detail", kwargs={
             'slug': self.slug
         })
+
+    def get_absolute_url(self):
+        return self.get_url()
     
 
 class Wishlist(models.Model):

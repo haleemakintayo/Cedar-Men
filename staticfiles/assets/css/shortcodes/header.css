@@ -4,7 +4,7 @@
     color: #333;
     display: inline-block;
     font-size: 20px;
-    padding: 21px 0 0;
+    padding: 26px 0 0;
     text-transform: uppercase;
 }
 /* menu */
@@ -63,7 +63,7 @@
     color: #999;
 }
 .logo img {
-    max-width: 150px;
+    max-width: 110px;
     width: auto;
 }
 /*------------- mobile menu --------------*/
@@ -283,6 +283,7 @@ a.top-cart {
 }
 .icon-search {
     position: relative;
+    float: right;
 }
 .toogle-content {
     display: none;

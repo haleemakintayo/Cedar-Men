@@ -108,6 +108,17 @@
         color: #28a745;
       }
 
+      .meanmenu-reveal {
+    border: 1px solid rgba(255, 255, 255, 0.7) !important; /* Shade of white */
+    color: #fff !important;
+    
+  }
+
+  .meanmenu-reveal span {
+      background-color: #fff !important; /* Ensure hamburger lines are white */
+  }
+
+
       .old-price {
         font-size: 0.9rem;
         text-decoration: line-through;
@@ -139,11 +150,11 @@
     <!-- Add your site or application content here -->
     <div class="waraper">
       <header>
-        <div class="header-area">
+        <div class="header-area" style="background: #000000;">
           <div class="container-fluid">
             <div class="row">
               <div class="col-lg-3 col-xl-3 col-md-4 col-4">
-                <div class="logo">
+                <div class="logo" style="margin-top: -7px;">
                   <a href="{% url 'home' %}"
                     ><img
                       src="{% static 'assets/img/logo/CedarMen-logo.png' %}"
@@ -156,7 +167,7 @@
                   <nav>
                     <ul class="menu">
                       <li>
-                        <a href="{% url 'home' %}">HOME <i class=""></i></a>
+                        <a style="color: white;" href="{% url 'home' %}">HOME <i class=""></i></a>
 
                         <!-- <ul>
                                                     <li><a href="index.html">home version 1</a></li>
@@ -167,9 +178,9 @@
                                                     <li><a href="index-6.html">home version 6</a></li>
                                               </ul> -->
                       </li>
-                      <li><a href="{% url 'about_us' %}">ABOUT US</a></li>
+                      <li><a style="color: white;" href="{% url 'about_us' %}">ABOUT US</a></li>
                       <li>
-                        <a href="#">pages <i class="pe-7s-angle-down"></i></a>
+                        <a style="color: white;" href="#">pages <i class="pe-7s-angle-down"></i></a>
                         <ul>
                           <li><a href="{% url 'about_us' %}">about us</a></li>
                           <li><a href="{% url 'shop' %}">shop</a></li>
@@ -190,9 +201,9 @@
                           </li>
                         </ul>
                       </li>
-                      <li><a href="{% url 'shop' %}">shop</a></li>
+                      <li><a style="color: white;" href="{% url 'shop' %}">shop</a></li>
                       <li>
-                        <a href="{% url 'blog' %}"
+                        <a style="color: white;" href="{% url 'blog' %}"
                           >BLOG <i class="pe-7s-angle-down"></i
                         ></a>
                         <ul>
@@ -205,7 +216,7 @@
                           </li>
                         </ul>
                       </li>
-                      <li><a href="{% url 'contact_us' %}">CONTACT</a></li>
+                      <li><a style="color: white;" href="{% url 'contact_us' %}">CONTACT</a></li>
                     </ul>
                   </nav>
                 </div>
@@ -215,7 +226,7 @@
               >
                 <div class="cart-user-language">
                   <div class="shopping-cart ml-30">
-                    <a class="top-cart" href="{% url 'cart_summary' %}">
+                    <a class="top-cart" href="{% url 'cart_summary' %}" style="color: white;">
                       <i class="pe-7s-cart"></i>
                     </a>
 
@@ -260,13 +271,247 @@
                     </ul>
                   </div>
 
+                  <!-- SEARCH (NEW) -->
+            <!-- <div class="icon-search">
+              <a href="#">
+                <i class="pe-7s-search"></i>
+              </a>
+            </div> -->
+
+
+
+            <!-- SEARCH (overlay, won't move the header) -->
+            <div class="header-search-wrapper">
+                <div class="icon-search">
+                    <i class="pe-7s-search"></i>
+                </div>
+                <!-- Search Box positioned absolutely relative to wrapper -->
+                <div class="search-box" id="header-search-box">
+                    <input type="text" id="header-search-input" placeholder="Search products..." autocomplete="off" />
+                    <div class="search-results" id="header-search-results"></div>
+                </div>
+            </div>
+
+            <style>
+  /* SEARCH STYLES UPDATED */
+  /* Wrapper acts like the other floated elements (.shopping-cart, .user) */
+  .header-search-wrapper {
+    float: right;
+    position: relative;
+    /* Match padding/margins of other header icons for vertical alignment */
+    /* .user > a has padding: 30px 0 10px 30px; */
+    padding: 30px 0 10px 15px; 
+    height: 90px; /* Explicit height to help vertical alignment if needed */
+  }
+
+  /* The Icon */
+  .icon-search {
+    cursor: pointer;
+    font-size: 24px;
+    color: white; 
+    display: block;
+    /* Remove flex centering on icon container, use line-height or padding matching others */
+    line-height: 1;
+    margin-top: 5px; /* Fine tune vertical alignment */
+  }
+  
+  .icon-search:hover {
+      color: #999;
+  }
+
+  /* Search Box Input - Positioned Absolutely to prevent layout shift */
+  #header-search-box {
+    display: none; /* toggled via JS */
+    position: absolute;
+    right: 35px; /* Position to the left of the icon (approx icon width + gap) */
+    top: 50%; /* Center vertically relative to wrapper */
+    transform: translateY(-25%); /* Adjust vertical center. Wrapper is tall (padding top 30). 
+                                     Halfway down is approx 45px. Input is 40px. 
+                                     Use direct pixels or calc if easier. 
+                                     Top: 25px matches padding roughly. */
+    top: 25px; /* Match padding-top of wrapper */
+    transform: none;
+    margin-right: 0;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+
+  #header-search-box input {
+    /* Mimic original style from header.css form#searchbox input */
+    background: #fff;
+    border: 1px solid #ebebeb;
+    color: #898989;
+    height: 40px;
+    padding: 10px 15px;
+    width: 250px;
+    border-radius: 0; 
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for overlay feel */
+  }
+  
+  #header-search-box input::placeholder {
+      color: #898989; 
+  }
+
+  /* Search Results Dropdown */
+  .search-results {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px; /* Match input width */
+    background: #fff;
+    border: 1px solid #ebebeb; 
+    border-top: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 0;
+    overflow-y: auto;
+    max-height: 300px;
+    z-index: 1001;
+  }
+  
+  .search-results:empty {
+      display: none;
+  }
+
+  .search-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+  }
+  
+  .search-item:hover {
+      background: #f9f9f9;
+  }
+
+  .header-area {
+    height: 100px;
+    width: 96%;
+    margin: 0 auto;
+    border-radius: 7px;
+  }
+
+  .search-item span {
+    font-size: 13px;
+    color: #333;
+  }
+  
+  .search-item a {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  /* RESPONSIVENESS */
+  @media (max-width: 768px) {
+    #header-search-box input {
+        width: 180px;
+    }
+    .search-results {
+        width: 180px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    /* Mobile: Keep inline if possible, or drop below if absolutely needed.
+       Right now with absolute right:35px it stays on row. */
+    #header-search-box input {
+        width: 140px;
+        padding: 5px 10px; 
+    }
+    .search-results {
+        width: 140px;
+    }
+  }
+
+</style>
+
+<script>
+const iconSearch = document.querySelector('.icon-search');
+const searchBox = document.getElementById('header-search-box');
+const searchInput = document.getElementById('header-search-input');
+const searchResults = document.getElementById('header-search-results');
+
+if(iconSearch && searchBox){
+    // Toggle search input on icon click
+    iconSearch.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent document click from closing immediately
+        const isVisible = searchBox.style.display === 'block';
+        searchBox.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) searchInput.focus();
+    });
+}
+
+if(searchInput){
+    // AJAX search
+    searchInput.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 1) {
+            searchResults.innerHTML = '';
+            // Hide results container if empty styling depends on it, but here :empty handles it
+            return;
+        }
+
+        fetch(`/ajax-search/?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                searchResults.innerHTML = '';
+                // If no results
+                if (!data.results || data.results.length === 0) {
+                     const div = document.createElement('div');
+                     div.classList.add('search-item');
+                     div.innerHTML = '<span style="padding:10px;">No results found</span>';
+                     searchResults.appendChild(div);
+                     return;
+                }
+                
+                data.results.forEach(product => {
+                    const div = document.createElement('div');
+                    div.classList.add('search-item');
+                    div.innerHTML = `
+                        <a href="${product.url}">
+                            <img src="${product.image}" alt="${product.name}" />
+                            <span>${product.name} - £${product.price}</span>
+                        </a>
+                    `;
+                    searchResults.appendChild(div);
+                });
+            })
+            .catch(err => console.error('Search error:', err));
+    });
+}
+
+// Hide search box when clicking outside
+document.addEventListener('click', function(e) {
+    if (searchBox && iconSearch) {
+        if (!searchBox.contains(e.target) && !iconSearch.contains(e.target)) {
+            searchBox.style.display = 'none';
+        }
+    }
+});
+
+// Prevent checking clicks inside the search box from closing it
+if(searchBox){
+    searchBox.addEventListener('click', function(e){
+        e.stopPropagation();
+    });
+}
+
+</script>
+
+
+                  
+
                   {% if user.is_authenticated %}
                   <div class="user">
-                    <a href="{% url 'logout' %}"><i class="pe-7s-power"></i></a>
+                    <a href="{% url 'logout' %}"><i class="pe-7s-power" ></i></a>
                   </div>
                   {% else %}
                   <div class="user">
-                    <a href="{% url 'login' %}"
+                    <a href="{% url 'login' %}" style="color: white;"
                       ><i class="pe-7s-add-user"></i
                     ></a>
                   </div>
@@ -274,7 +519,7 @@
                   <div class="language-menu none">
                     <ul>
                       <li>
-                        <a href="#">eng <i class="pe-7s-angle-down"></i></a>
+                        <a style="color: white;" href="#">eng <i class="pe-7s-angle-down"></i></a>
                         <ul>
                           <li><a href="#">eng</a></li>
                           <li><a href="#">fre</a></li>
@@ -282,7 +527,7 @@
                         </ul>
                       </li>
                       <li>
-                        <a href="#">usd <i class="pe-7s-angle-down"></i></a>
+                        <a style="color: white;" href="#">usd <i class="pe-7s-angle-down"></i></a>
                         <ul>
                           <li><a href="#">usd</a></li>
                           <li><a href="#">eur</a></li>
@@ -318,6 +563,7 @@
       </div>
 
       {% block content %} {% endblock %}
+
 
       <footer class="footer-area" style="background-color: #000000;"><br>
         <div class="container-fluid">

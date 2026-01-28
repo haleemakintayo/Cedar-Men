@@ -1,4 +1,5 @@
 from django.urls import path,include
+from . import views
 
 
 
@@ -34,6 +35,8 @@ urlpatterns = [
     path('ecommerce/checkout/', checkout, name='checkout'),
     path('ecommerce/wishlist/', wishlist, name='wishlist'),
     path('ecommerce/blog/', blog, name='blog'),
+    path('ajax-search/', views.ajax_search, name='ajax_search'),
+
 
 ]
 

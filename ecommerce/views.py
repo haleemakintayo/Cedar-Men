@@ -164,5 +164,31 @@ def contact_us(request):
 
 
 
+from django.http import JsonResponse
+from django.db.models import Q
+from ecommerce.models import Product
+
+
+
+
+from django.http import JsonResponse
+from .models import Product
+
+def ajax_search(request):
+    query = request.GET.get('query', '')
+    if query:
+        products = Product.objects.filter(name__icontains=query)[:10]
+        results = []
+        for p in products:
+            results.append({
+                'name': p.name,
+                'price': str(p.price),
+                'image': p.image.url if p.image else '',
+                'url': p.get_absolute_url() if hasattr(p, 'get_absolute_url') else '#'
+            })
+        return JsonResponse({'results': results})
+    return JsonResponse({'results': []})
+
+
 
 

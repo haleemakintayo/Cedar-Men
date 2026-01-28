@@ -354,21 +354,21 @@ h2.page-title {
 }
 .breadcrumb-stye ul > li {
     display: inline-block;
-    color: #222;
+    color: #fff;
     text-transform: capitalize;
     font-size: 15px;
 }
 .breadcrumb-stye ul li a {
-    color: #3c3c3c;
+    color: #fff;
     position: relative;
     padding-right: 17px;
     transition: all .3s ease 0s;
 }
 .breadcrumb-stye ul li a:hover {
-    color: #000;
+    color: #fff;
 }
 .breadcrumb-stye ul li a::after {
-    background-color: #464646;
+    background-color: #fff;
     content: "";
     font-size: 8px;
     height: 15px;
