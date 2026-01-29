@@ -386,8 +386,8 @@
   }
 
   .header-area {
-    height: 100px;
-    width: 96%;
+    height: 90px;
+    width: 97%;
     margin: 0 auto;
     border-radius: 7px;
   }
@@ -406,27 +406,71 @@
   }
 
   /* RESPONSIVENESS */
-  @media (max-width: 768px) {
+  
+  /* Laptop / Medium Desktop (992px - 1199px) */
+  @media (min-width: 992px) and (max-width: 1199px) {
     #header-search-box input {
-        width: 180px;
+        width: 300px; /* Wider input */
     }
     .search-results {
-        width: 180px;
+        width: 300px; /* Wider dropdown */
+    }
+    .search-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    .search-item span {
+        font-size: 14px;
+        line-height: 1.4;
     }
   }
 
-  @media (max-width: 576px) {
-    /* Mobile: Keep inline if possible, or drop below if absolutely needed.
-       Right now with absolute right:35px it stays on row. */
+  /* Tablet / iPad (768px - 991px) */
+  @media (min-width: 768px) and (max-width: 991px) {
     #header-search-box input {
-        width: 140px;
-        padding: 5px 10px; 
+        width: 280px;
     }
     .search-results {
-        width: 140px;
+        width: 280px;
+    }
+    .search-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+    .search-item span {
+        font-size: 14px;
     }
   }
 
+  /* Mobile (max-width: 767px - covers both small and large mobile) */
+  @media (max-width: 767px) {
+    #header-search-box {
+        right: 10px; 
+    }
+    #header-search-box input {
+        width: 260px; /* Ensure fits on 320px screens too */
+        padding: 10px; 
+    }
+    .search-results {
+        width: 260px; 
+    }
+    
+    .search-item img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain; /* or cover */
+        margin-right: 10px;
+    }
+    
+    .search-item span {
+        font-size: 14px;
+        white-space: normal; /* Allow text wrapping */
+    }
+  }
 </style>
 
 <script>

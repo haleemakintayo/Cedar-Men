@@ -519,7 +519,7 @@
   }
   .shopping-cart.ml-30 {
     margin-left: 10px;
-    margin-right: 37px;
+    margin-right: 0; /* Removed 37px margin to align to right */
   }
   .user > a {
     padding: 30px 0 10px 10px;
@@ -550,8 +550,11 @@
   .style-6.stick .mean-container a.meanmenu-reveal {
     margin-top: -52px;
   }
+
   .style-6 .mean-container a.meanmenu-reveal {
     margin-top: -54px;
+    left: 0 !important;
+    right: auto !important;
   }
   .header-area .header-sticky .user > a {
     padding: 14px 0 10px 10px;
@@ -620,6 +623,73 @@
     width: 100%;
     float: inherit;
   }
+
+
+  /* Generic meanmenu reveal positioning for Base template */
+  .mobile-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+  }
+  
+  .mean-container .mean-bar {
+      background: transparent !important;
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 0 !important;
+      min-height: 0 !important;
+  }
+
+
+
+
+
+
+  /* The hamburger icon itself */
+  .mean-container a.meanmenu-reveal {
+      left: 10px !important; /* Move to far left */
+      right: auto !important;
+      top: 28px !important; /* Vertically centered-ish */
+      margin-top: 0 !important;
+      z-index: 1000;
+      border: none !important;
+      color: #fff !important;
+      padding-right: 5px !important; /* Reduce right padding to allow logo to be closer without overlap */
+      width: 22px !important; /* Restore fixed width to prevent collapse */
+      box-sizing: content-box; /* Ensure padding doesn't shrink the 22px content width */
+  }
+  
+  .mean-container a.meanmenu-reveal span {
+      background-color: #fff !important;
+  }
+
+  /* Fix logo position - Tight spacing */
+  /* Bars end at: 0 (left) + 13px (pad-left) + 22px (width) = 35px. */
+  /* Logo starts at: 40px. Gap = 5px. */
+  .logo {
+      position: relative;
+      z-index: 1; 
+      margin-top: 0 !important;
+      padding-left: -3px; /* Starts just after the icon bars + 5px gap */
+      text-align: left; 
+  }
+  
+  /* Override the generic padding from line 528 for mobile to move logo UP */
+  .logo > a {
+      padding-top: 17px !important; 
+      display: inline-block;
+  }
+
+  /* Adjust sticky state */
+  .header-area.stick .mean-container a.meanmenu-reveal {
+      top: 15px !important;
+  }
+  
+  /* Reset modal content if it was affected */
   .modal-pro-content {
     float: inherit;
     padding-left: 0;
