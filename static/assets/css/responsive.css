@@ -657,14 +657,18 @@
       margin-top: 0 !important;
       z-index: 1000;
       border: none !important;
-      color: #fff !important;
+      color: #000000 !important;
       padding-right: 5px !important; /* Reduce right padding to allow logo to be closer without overlap */
       width: 22px !important; /* Restore fixed width to prevent collapse */
       box-sizing: content-box; /* Ensure padding doesn't shrink the 22px content width */
   }
+
+  .mean-container a.meanmenu-reveal.meanclose {
+      color: #ffffff !important;
+  }
   
   .mean-container a.meanmenu-reveal span {
-      background-color: #fff !important;
+      background-color: #000000 !important;
   }
 
   /* Fix logo position - Tight spacing */
@@ -729,5 +733,16 @@
     padding-left: 25px;
     width: 60%;
     padding-top: 0px;
+  }
+}
+
+/* Override for mobile breadcrumb separator */
+@media (max-width: 767px) {
+  .breadcrumb-stye ul li a::after {
+      background-color: #000000 !important;
+      content: "" !important;
+      display: block !important;
+      width: 1.5px !important;
+      height: 15px !important;
   }
 }

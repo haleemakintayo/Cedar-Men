@@ -352,23 +352,26 @@ h2.page-title {
     letter-spacing: 2px;
     text-transform: uppercase;
 }
+.breadcrumb-stye h2.page-title {
+    color: #000000 !important;
+}
 .breadcrumb-stye ul > li {
     display: inline-block;
-    color: #fff;
+    color: #000000 !important;
     text-transform: capitalize;
     font-size: 15px;
 }
 .breadcrumb-stye ul li a {
-    color: #fff;
+    color: #000000 !important;
     position: relative;
     padding-right: 17px;
     transition: all .3s ease 0s;
 }
 .breadcrumb-stye ul li a:hover {
-    color: #fff;
+    color: #000000 !important;
 }
 .breadcrumb-stye ul li a::after {
-    background-color: #fff;
+    background-color: #000000 !important;
     content: "";
     font-size: 8px;
     height: 15px;
@@ -1317,3 +1320,9 @@ a#scrollUp:hover {
 
 
 
+
+@media (max-width: 767px) {
+    .breadcrumb-stye ul li a::after {
+        background-color: #000000 !important;
+    }
+}

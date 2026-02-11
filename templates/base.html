@@ -49,7 +49,7 @@
       rel="stylesheet"
       href="{% static 'assets/css/shortcodes/shortcode.css' %}"
     />
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}?v=3" />
     <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}" />
     <script src="{% static 'assets/js/vendor/modernizr-3.11.7.min.js' %}"></script>
 
@@ -109,13 +109,13 @@
       }
 
       .meanmenu-reveal {
-    border: 1px solid rgba(255, 255, 255, 0.7) !important; /* Shade of white */
-    color: #fff !important;
+    border: 1px solid #ffffff !important; /* Shade of white */
+    color: #ffffff !important;
     
   }
 
   .meanmenu-reveal span {
-      background-color: #fff !important; /* Ensure hamburger lines are white */
+      background-color: #ffffff !important; /* Ensure hamburger lines are white */
   }
 
 
@@ -150,7 +150,7 @@
     <!-- Add your site or application content here -->
     <div class="waraper">
       <header>
-        <div class="header-area" style="background: #000000;">
+        <div class="header-area" style="background: #fff;">
           <div class="container-fluid">
             <div class="row">
               <div class="col-lg-3 col-xl-3 col-md-4 col-4">
@@ -167,7 +167,7 @@
                   <nav>
                     <ul class="menu">
                       <li>
-                        <a style="color: white;" href="{% url 'home' %}">HOME <i class=""></i></a>
+                        <a href="{% url 'home' %}">HOME <i class=""></i></a>
 
                         <!-- <ul>
                                                     <li><a href="index.html">home version 1</a></li>
@@ -178,9 +178,9 @@
                                                     <li><a href="index-6.html">home version 6</a></li>
                                               </ul> -->
                       </li>
-                      <li><a style="color: white;" href="{% url 'about_us' %}">ABOUT US</a></li>
+                      <li><a href="{% url 'about_us' %}">ABOUT US</a></li>
                       <li>
-                        <a style="color: white;" href="#">pages <i class="pe-7s-angle-down"></i></a>
+                        <a href="#">pages <i class="pe-7s-angle-down"></i></a>
                         <ul>
                           <li><a href="{% url 'about_us' %}">about us</a></li>
                           <li><a href="{% url 'shop' %}">shop</a></li>
@@ -201,9 +201,9 @@
                           </li>
                         </ul>
                       </li>
-                      <li><a style="color: white;" href="{% url 'shop' %}">shop</a></li>
+                      <li><a href="{% url 'shop' %}">shop</a></li>
                       <li>
-                        <a style="color: white;" href="{% url 'blog' %}"
+                        <a href="{% url 'blog' %}"
                           >BLOG <i class="pe-7s-angle-down"></i
                         ></a>
                         <ul>
@@ -216,7 +216,7 @@
                           </li>
                         </ul>
                       </li>
-                      <li><a style="color: white;" href="{% url 'contact_us' %}">CONTACT</a></li>
+                      <li><a style="color: rgb(0, 0, 0);" href="{% url 'contact_us' %}">CONTACT</a></li>
                     </ul>
                   </nav>
                 </div>
@@ -226,7 +226,7 @@
               >
                 <div class="cart-user-language">
                   <div class="shopping-cart ml-30">
-                    <a class="top-cart" href="{% url 'cart_summary' %}" style="color: white;">
+                    <a class="top-cart" href="{% url 'cart_summary' %}" style="color: rgb(0, 0, 0);">
                       <i class="pe-7s-cart"></i>
                     </a>
 
@@ -308,7 +308,7 @@
   .icon-search {
     cursor: pointer;
     font-size: 24px;
-    color: white; 
+    color: rgb(10, 10, 10); 
     display: block;
     /* Remove flex centering on icon container, use line-height or padding matching others */
     line-height: 1;
@@ -555,7 +555,7 @@ if(searchBox){
                   </div>
                   {% else %}
                   <div class="user">
-                    <a href="{% url 'login' %}" style="color: white;"
+                    <a href="{% url 'login' %}" style="color: rgb(0, 0, 0);"
                       ><i class="pe-7s-add-user"></i
                     ></a>
                   </div>
