@@ -192,6 +192,7 @@
                             <a href="{% url 'register' %}">register</a>
                           </li>
                           <li><a href="{% url 'checkout' %}">checkout</a></li>
+                          <li><a href="{% url 'order_tracking' %}">track orders</a></li>
                           <li><a href="{% url 'wishlist' %}">wishlist</a></li>
                           <li>
                             <a href="product-details.html">shop details</a>
@@ -686,6 +687,7 @@ if(searchBox){
                         <li><a style="color: #ffffff;" href="{% url 'wishlist' %}">Wishlist</a></li>
                         <li><a style="color: #ffffff;" href="{% url 'cart_summary' %}">My Cart</a></li>
                         <li><a style="color: #ffffff;" href="{% url 'checkout' %}">Checkout</a></li>
+                        <li><a style="color: #ffffff;" href="{% url 'order_tracking' %}">Track Orders</a></li>
                       </ul>
                     </div>
                   </div>
@@ -875,7 +877,10 @@ if(searchBox){
           .on("click", ".add-to-wishlist", function (e) {
             e.preventDefault(); // Cancel the default navigation
             e.stopPropagation();
-            var url = $(this).attr("href");
+            var url = $(this).closest("a").attr("href") || $(this).attr("href");
+            if (!url) {
+              return false;
+            }
 
             $.ajax({
               url: url,

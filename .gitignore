@@ -9,3 +9,6 @@ Cedarmen/__pycache__/wsgi.cpython-312.pyc
 /Cedarmen/__pycache__
 __pycache__/
 db.sqlite3
+.env
+.env.*
+!.env.example
