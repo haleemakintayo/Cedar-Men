@@ -18,7 +18,11 @@
         </div>
         <!-- Order Confirmation Content -->
         <h1>Thank you for your order!</h1>
-        <p>Your order number is <strong>{{ order.id }}</strong>.</p>
+        <p>Your order number is <strong>{{ order.order_number }}</strong>.</p>
+        <p>Payment status: <strong>{{ order.status|title }}</strong>.</p>
+        {% if invoice %}
+        <p>Your invoice number is <strong>{{ invoice.invoice_number }}</strong>.</p>
+        {% endif %}
         <p>A confirmation email has been sent to <strong>{{ order.email }}</strong>.</p>
         <h2>Order Details</h2>
         <table class="table table-bordered">
@@ -57,6 +61,7 @@
                 </tr>
             </tfoot>
         </table>
+        <a href="{% url 'order_tracking' %}" class="btn btn-outline-secondary me-2">Track Orders</a>
         <a href="{% url 'home' %}" class="btn btn-dark">Continue Shopping</a>
     </div>
 </div>

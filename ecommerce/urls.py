@@ -9,7 +9,7 @@ from .views import (
 
     product_details,contact_us,
 
-    product_details,checkout,wishlist,
+    product_details,ecommerce_checkout,wishlist,
     add_to_wishlist,remove_from_wishlist,
     add_review,category_products
 
@@ -32,7 +32,7 @@ urlpatterns = [
     path('contact_us/', contact_us, name='contact_us'),
 
     path('cart/', include('cart.urls')),
-    path('ecommerce/checkout/', checkout, name='checkout'),
+    path('ecommerce/checkout/', ecommerce_checkout, name='ecommerce_checkout'),
     path('ecommerce/wishlist/', wishlist, name='wishlist'),
     path('ecommerce/blog/', blog, name='blog'),
     path('ajax-search/', views.ajax_search, name='ajax_search'),

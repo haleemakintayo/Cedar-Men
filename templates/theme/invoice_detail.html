@@ -17,8 +17,8 @@
           <div class="row mb-4">
             <div class="col-6">
               <h5>Billed To:</h5>
-              <p>{{ invoice.user.get_full_name }}</p>
-              <p>{{ invoice.user.email }}</p>
+              <p>{{ invoice.customer.fullname }}</p>
+              <p>{{ invoice.customer.email }}</p>
               <!-- Add more user details like address if available -->
             </div>
             <div class="col-6 text-right">
@@ -43,7 +43,7 @@
             <tbody>
               {% for item in invoice.invoiceitem_set.all %}
               <tr>
-                <td>{{ item.product.name }}</td>
+                <td>{{ item.product_name }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>${{ item.unit_price }}</td>
                 <td>${{ item.total_price }}</td>
@@ -65,11 +65,11 @@
           </div>
           {% endif %}
 
-          <a
-            href="{% url 'order_confirmation' invoice.order.id %}"
-            class="btn btn-sm btn-secondary"
-            >Continue</a
-          >
+          {% if invoice.order %}
+          <a href="{% url 'order_confirmation' invoice.order.order_number %}" class="btn btn-sm btn-secondary">Continue</a>
+          {% else %}
+          <a href="{% url 'home' %}" class="btn btn-sm btn-secondary">Continue</a>
+          {% endif %}
         </div>
       </div>
     </div>

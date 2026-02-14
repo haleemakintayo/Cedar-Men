@@ -71,7 +71,7 @@ def blog(request):
     return render(request, 'blog.html', {'blogs': blogs})
 
 @login_required(login_url='login')
-def checkout(request):
+def ecommerce_checkout(request):
     return render(request, 'checkout.html')
 
 @require_POST
