@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from ecommerce.forms import ProductForm, InvoiceItemForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse
+from django.db.models import Q
 
 # Add your views here:
 
@@ -293,14 +294,18 @@ def order_list(request):
   query = request.GET.get("q", "")
 
   if query:
-    orders = orders.filter(customer__fullname__icontains=query) 
+    orders = orders.filter(
+      Q(order_number__icontains=query) |
+      Q(user__fullname__icontains=query) |
+      Q(user__email__icontains=query)
+    )
 
   # Paginate with 10 products per page:
   paginator = Paginator(orders, 10)
   page_number = request.GET.get('page')
-  order = paginator.get_page(page_number)
+  page_obj = paginator.get_page(page_number)
 
-  return render(request, 'theme/order_list.html', {'query':query, 'orders': orders, 'order': order})
+  return render(request, 'theme/order_list.html', {'query': query, 'page_obj': page_obj})
 
 def staff_list(request):
   users = User.objects.all()
