@@ -76,7 +76,7 @@
                                         <div class="cart-total">
                                             <h2>Cart totals</h2>
                                             <ul>
-                                                <li>Subtotal <span id="cart-subtotal">£ {{ cart.total_price|floatformat:2 }}</span></li>
+                                                <li>Subtotal <span id="cart-total">£ {{ cart.total_price|floatformat:2 }}</span></li>
                                                 <li>Total <span id="cart-total">£ {{ cart.total_price|floatformat:2 }}</span></li>
                                             </ul>
                                             <a href="{% url 'checkout' %}">Proceed to checkout</a>
@@ -109,7 +109,6 @@
                             // Update the subtotal cell in this row
                             row.find('.product-subtotal').text("£" + response.subtotal.toFixed(2));
                             // Update the cart total display
-                            $('#cart-subtotal').text("£" + response.total.toFixed(2));
                             $('#cart-total').text("£" + response.total.toFixed(2));
                         },
                         error: function(xhr){
@@ -134,7 +133,6 @@
                             // Remove the row from the table
                             row.remove();
                             // Update the cart total display
-                            $('#cart-subtotal').text("£" + response.total.toFixed(2));
                             $('#cart-total').text("£" + response.total.toFixed(2));
                         },
                         error: function(xhr){

@@ -1,34 +1,17 @@
-from decimal import Decimal, ROUND_HALF_UP
-
-import stripe
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
+from django.contrib import messages
 from orders.models import Order, OrderItem
-from orders.payment_utils import finalize_order_payment
-from cart.utils import get_cart
-from ecommerce.models import Invoice
+from cart.utils import get_cart  
+from cart.models import CartItem
+from django.conf import settings
 
-def _to_stripe_amount(amount: Decimal) -> int:
-    return int((amount * Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
-
-
-@login_required(login_url='login')
 def checkout(request):
     cart = get_cart(request)
-    cart_items = list(cart.items.select_related('product', 'color', 'size'))
-    if not cart_items:
+    if cart.items.count() == 0:
         messages.error(request, "Your cart is empty.")
         return redirect('cart_summary')
 
     if request.method == 'POST':
-        if not settings.STRIPE_SECRET_KEY:
-            messages.error(request, "Stripe is not configured. Please contact support.")
-            return redirect('checkout')
-
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -42,7 +25,7 @@ def checkout(request):
         total = cart.total_price()
 
         order = Order.objects.create(
-            user=request.user,
+            user=request.user if request.user.is_authenticated else None,
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -51,11 +34,10 @@ def checkout(request):
             state=state,
             postcode=postcode,
             country=country,
-            total=total,
-            status='pending',
+            total=total
         )
 
-        for item in cart_items:
+        for item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
@@ -64,49 +46,9 @@ def checkout(request):
                 color=item.color,
                 size=item.size
             )
-
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        line_items = []
-        for item in cart_items:
-            line_items.append({
-                'price_data': {
-                    'currency': settings.STRIPE_CURRENCY,
-                    'product_data': {
-                        'name': item.product.name,
-                    },
-                    'unit_amount': _to_stripe_amount(item.product.price),
-                },
-                'quantity': item.quantity,
-            })
-
-        success_url = request.build_absolute_uri(reverse('stripe-checkout-success'))
-        success_url = f"{success_url}?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = request.build_absolute_uri(reverse('stripe-checkout-cancel'))
-        cancel_url = f"{cancel_url}?order_number={order.order_number}"
-
-        try:
-            session = stripe.checkout.Session.create(
-                mode='payment',
-                line_items=line_items,
-                client_reference_id=order.order_number,
-                metadata={
-                    'order_id': str(order.id),
-                    'order_number': order.order_number,
-                    'user_id': str(request.user.id),
-                },
-                success_url=success_url,
-                cancel_url=cancel_url,
-            )
-        except stripe.error.StripeError:
-            order.delete()
-            messages.error(request, "Unable to initialize payment. Please try again.")
-            return redirect('checkout')
-
-        order.stripe_session_id = session.id
-        order.stripe_payment_intent_id = session.payment_intent
-        order.save(update_fields=['stripe_session_id', 'stripe_payment_intent_id'])
-
-        return redirect(session.url)
+        cart.items.all().delete()
+        messages.success(request, "Your order has been placed successfully!")
+        return redirect('generate-invoice', order_id=order.id)
     else:
         context = {
             'cart': cart,
@@ -114,70 +56,10 @@ def checkout(request):
         return render(request, 'checkout.html', context)
 
 
-@login_required(login_url='login')
-def stripe_checkout_success(request):
-    session_id = request.GET.get('session_id')
-    if not session_id:
-        messages.error(request, "Missing Stripe session.")
-        return redirect('checkout')
 
-    order = get_object_or_404(Order, stripe_session_id=session_id, user=request.user)
-    if order.status != 'paid' and settings.STRIPE_SECRET_KEY:
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        try:
-            session = stripe.checkout.Session.retrieve(session_id)
-            if session.get('payment_status') == 'paid':
-                finalize_order_payment(
-                    order,
-                    stripe_session_id=session.get('id'),
-                    stripe_payment_intent_id=session.get('payment_intent'),
-                )
-                order.refresh_from_db(fields=['status'])
-        except stripe.error.StripeError:
-            pass
-
-    if order.status != 'paid':
-        messages.info(request, "Payment is processing. Please refresh in a moment.")
-
-    return redirect('order_confirmation', order_number=order.order_number)
-
-
-@login_required(login_url='login')
-def stripe_checkout_cancel(request):
-    order_number = request.GET.get('order_number')
-    if order_number:
-        order = Order.objects.filter(order_number=order_number, user=request.user).first()
-        if order and order.status == 'pending':
-            order.status = 'canceled'
-            order.save(update_fields=['status'])
-    messages.warning(request, "Payment was canceled. Your cart is still intact.")
-    return redirect('checkout')
-
-
-@login_required(login_url='login')
-def order_confirmation(request, order_number):
-    order = get_object_or_404(Order, order_number=order_number, user=request.user)
-    invoice = Invoice.objects.filter(order=order).first()
+def order_confirmation(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
     context = {
-        'order': order,
-        'invoice': invoice,
+        'order': order
     }
     return render(request, 'order-confirmation.html', context)
-
-
-@login_required(login_url='login')
-def order_tracking(request):
-    query = request.GET.get('q', '').strip()
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-
-    if query:
-        orders = orders.filter(
-            Q(order_number__icontains=query) |
-            Q(status__icontains=query)
-        )
-
-    context = {
-        'orders': orders,
-        'query': query,
-    }
-    return render(request, 'order-tracking.html', context)

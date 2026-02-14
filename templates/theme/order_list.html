@@ -11,7 +11,7 @@
         type="text"
         name="q"
         class="form-control border-primary rounded-start"
-        placeholder="Search by order number, customer name, or email..."
+        placeholder="Search Orders by Customer Name..."
         value="{{ query }}"
         aria-label="Search"
       />
@@ -25,7 +25,6 @@
     <thead class="thead-dark">
       <tr>
         <th>ORDER ID</th>
-        <th>ORDER NUMBER</th>
         <th>CUSTOMER</th>
         <th>TOTAL AMOUNT</th>
         <th>STATUS</th>
@@ -33,11 +32,10 @@
       </tr>
     </thead>
     <tbody>
-      {% for order in page_obj %}
+      {% for order in orders %}
       <tr>
         <td>{{ order.id }}</td>
-        <td>{{ order.order_number }}</td>
-        <td>{% if order.user %}{{ order.user.fullname|default:order.user.email }}{% else %}Guest{% endif %}</td>
+        <td>{{ order.customer.fullname }}</td>
         <td>${{ order.total }}</td>
         <td>
           {% if order.status == "pending" %}
@@ -61,12 +59,12 @@
   <!-- Pagination Controls -->
   <nav aria-label="Invoice Pagination">
     <ul class="pagination justify-content-center">
-      {% if page_obj.has_previous %}
+      {% if order.has_previous %}
       <li class="page-item">
         <a class="page-link" href="?page=1">First</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+        <a class="page-link" href="?page={{ order.previous_page_number }}"
           >Previous</a
         >
       </li>
@@ -74,16 +72,16 @@
 
       <li class="page-item active">
         <span class="page-link">
-          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          Page {{ order.number }} of {{ order.paginator.num_pages }}
         </span>
       </li>
 
-      {% if page_obj.has_next %}
+      {% if order.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="page-link" href="?page={{ order.next_page_number }}">Next</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
+        <a class="page-link" href="?page={{ order.paginator.num_pages }}"
           >Last</a
         >
       </li>

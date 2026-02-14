@@ -4,7 +4,7 @@ djangorestframework==3.15.2
 gunicorn==23.0.0
 whitenoise==6.9.0
 dj-database-url==2.3.0
-psycopg[binary]   # Swapped to binary for easier install on Heroku
+psycopg2-binary==2.9.10     # Swapped to binary for easier install on Heroku
 asgiref==3.11.0
 
 # --- Async & Real-time (Channels) ---
@@ -35,9 +35,6 @@ requests==2.32.5
 # --- PDF Generation ---
 xhtml2pdf==0.2.17
 reportlab==4.4.7
-
-# --- Payments ---
-stripe==10.12.0
 
 # --- AI, Bots & API Clients ---
 openai==1.37.1

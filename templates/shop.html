@@ -86,10 +86,7 @@
       .on("click", ".add-to-wishlist", function (e) {
         e.preventDefault(); // Cancel the default navigation
         e.stopPropagation();
-        var url = $(this).closest("a").attr("href") || $(this).attr("href");
-        if (!url) {
-          return false;
-        }
+        var url = $(this).attr("href");
 
         $.ajax({
           url: url,

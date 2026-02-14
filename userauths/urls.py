@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import views, payment_views
+from . import views
 
 urlpatterns = [
   path('login/', views.login_view, name='login'), 
@@ -24,9 +24,6 @@ urlpatterns = [
   path('invoices/<int:invoice_id>/', views.view_invoice, name='view-invoice'), # Invoice detail 
   path('invoices-admin/<int:invoice_id>/', views.view_invoice_admin, name='view-invoice-admin'), # Invoice detail admin
   path('orders/<int:order_id>/generate-invoice/', views.generate_invoice, name='generate-invoice'), # Generate invoice 
-
-  # Stripe webhook
-  path('stripe/webhook/', payment_views.payment_webhook, name='stripe-webhook'),
 
   # Staff urls
   path('dashboard-admin/staffs', views.staff_list, name='staff-list'), 

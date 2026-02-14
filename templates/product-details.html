@@ -118,7 +118,7 @@
                     <!-- Useful Links -->
                     <ul class="usefull-link section">
                         <li><a href="#"><i class="pe-7s-mail"></i> Email to a Friend</a></li>
-                        <li><a href="{% url 'add_to_wishlist' product.slug %}" class="add-to-wishlist"><i class="pe-7s-like"></i> Wishlist</a></li>
+                        <li><a href="{% url 'add_to_wishlist' product.slug %}"><i class="pe-7s-like add-to-wishlist"></i> Wishlist</a></li>
                         <li><a href="#"><i class="pe-7s-print"></i> Print</a></li>
                     </ul>
                     <!-- Share Icons -->
@@ -288,12 +288,9 @@ document.addEventListener('DOMContentLoaded', function() {
     //ADD TO WISHLIST FUNCTION
     $(document).ready(function(){
       // Delegate click event for add-to-wishlist links
-      $(document).off('click', '.add-to-wishlist').on('click', '.add-to-wishlist', function(e){
+      $(document).on('click', '.add-to-wishlist', function(e){
           e.preventDefault(); // Cancel the default navigation
-          var url = $(this).closest('a').attr('href') || $(this).attr('href');
-          if (!url) {
-              return false;
-          }
+          var url = $(this).attr('href');
           
           $.ajax({
               url: url,

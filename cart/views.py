@@ -23,14 +23,13 @@ def update_cart_item(request):
     """
     item_id = request.POST.get('item_id')
     quantity = request.POST.get('quantity')
-    cart = get_cart(request)
     
     try:
         quantity = int(quantity)
     except (ValueError, TypeError):
         return JsonResponse({'error': 'Invalid quantity'}, status=400)
     
-    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+    cart_item = get_object_or_404(CartItem, id=item_id)
     if quantity <= 0:
         cart_item.delete()
         new_quantity = 0
@@ -55,8 +54,7 @@ def remove_cart_item(request):
     Expects POST data with 'item_id'.
     """
     item_id = request.POST.get('item_id')
-    cart = get_cart(request)
-    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+    cart_item = get_object_or_404(CartItem, id=item_id)
     cart_item.delete()
     cart = cart_item.cart
     return JsonResponse({
@@ -67,12 +65,7 @@ def remove_cart_item(request):
 def add_to_cart(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
     cart = get_cart(request)
-    try:
-        quantity = int(request.POST.get('quantity', 1))
-        if quantity < 1:
-            raise ValueError
-    except (TypeError, ValueError):
-        return JsonResponse({'error': 'Invalid quantity'}, status=400)
+    quantity = int(request.POST.get('quantity', 1))
 
     # Get the selected color and size from POST data.
     color_id = request.POST.get('color')  # expecting an ID (as string)
