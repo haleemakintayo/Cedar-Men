@@ -16,7 +16,9 @@
         <div class="category-card">
           <a href="{% url 'category_products' category.slug %}">
             <div class="category-img-container">
+              {% if category.image %}
               <img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid">
+              {% endif %}
               <div class="category-overlay">
                 <h4>{{ category.name }}</h4>
                 <p>{{ category.description|truncatechars:50 }}</p>
@@ -48,11 +50,19 @@
           <div class="shop hover-style mb-30">
             <div class="shop-img-container">
               <a href="{{ product.get_url }}">
+                {% if product.image %}
                 <img
                   src="{{ product.image.url }}"
                   alt="{{ product.name }}"
                   class="shop-img"
                 />
+                {% else %}
+                <img
+                  src="{% static 'assets/img/product/default.jpg' %}"
+                  alt="{{ product.name }}"
+                  class="shop-img"
+                />
+                {% endif %}
               </a>
             </div>
             <div class="shop-title title-style-1">

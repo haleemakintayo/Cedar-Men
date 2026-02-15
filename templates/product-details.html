@@ -25,7 +25,9 @@
                 <div class="tab-content product-details-large mb-10">
                     <!-- Main product image -->
                     <div class="pro-large-img tab-pane active" id="pro-large-img-1">
+                        {% if product.image %}
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                        {% endif %}
                     </div>
                     {# Additional thumbnails can be added here if available #}
                 </div>
@@ -33,7 +35,9 @@
                 <div class="pro-thumb-img-slider nav">
                     <div>
                         <a href="#pro-large-img-1" data-bs-toggle="tab">
+                            {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                            {% endif %}
                         </a>
                     </div>
                 </div>
