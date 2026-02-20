@@ -156,6 +156,21 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import urllib.parse
+
+# Parse Cloudinary URL manually to configure dj-cloudinary-storage
+cloudinary_url = os.environ.get('CLOUDINARY_URL')
+if cloudinary_url:
+    parsed_url = urllib.parse.urlparse(cloudinary_url)
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': parsed_url.hostname,
+        'API_KEY': parsed_url.username,
+        'API_SECRET': parsed_url.password,
+    }
+
 # CRITICAL FIX: Use the non-manifest storage to avoid the "MissingFileError" crash
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
