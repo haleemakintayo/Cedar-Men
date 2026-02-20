@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'userauths',
     'ecommerce',
     'cart',
@@ -152,6 +154,7 @@ STATICFILES_DIRS = [
 # Media files (User uploaded images)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # CRITICAL FIX: Use the non-manifest storage to avoid the "MissingFileError" crash
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
