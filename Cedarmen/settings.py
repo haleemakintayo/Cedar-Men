@@ -95,11 +95,13 @@ WSGI_APPLICATION = 'Cedarmen.wsgi.application'
 #     )
 # }
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
 }
 
 
@@ -146,6 +148,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# Media files (User uploaded images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CRITICAL FIX: Use the non-manifest storage to avoid the "MissingFileError" crash
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
