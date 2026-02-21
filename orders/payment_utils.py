@@ -54,6 +54,10 @@ def finalize_order_payment(order, stripe_session_id=None, stripe_payment_intent_
         cart = Cart.objects.filter(user=order.user).first()
         if cart:
             cart.items.all().delete()
+    elif order.guest_session_key:
+        guest_cart = Cart.objects.filter(user__isnull=True, session_key=order.guest_session_key).first()
+        if guest_cart:
+            guest_cart.items.all().delete()
 
 
 def mark_order_failed(order):

@@ -3,7 +3,6 @@ from decimal import Decimal, ROUND_HALF_UP
 import stripe
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -16,9 +15,33 @@ def _to_stripe_amount(amount: Decimal) -> int:
     return int((amount * Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
-@login_required(login_url='login')
+def _get_or_create_session_key(request):
+    if not request.session.session_key:
+        request.session.create()
+    return request.session.session_key
+
+
+def _can_access_order(request, order):
+    if order.user_id:
+        return request.user.is_authenticated and request.user.id == order.user_id
+    session_key = request.session.session_key
+    if session_key and order.guest_session_key and session_key == order.guest_session_key:
+        return True
+    verified_orders = request.session.get('verified_order_numbers', [])
+    return order.order_number in verified_orders
+
+
+def _mark_order_verified(request, order_number):
+    verified_orders = request.session.get('verified_order_numbers', [])
+    if order_number not in verified_orders:
+        verified_orders.append(order_number)
+        request.session['verified_order_numbers'] = verified_orders[-20:]
+        request.session.modified = True
+
+
 def checkout(request):
     cart = get_cart(request)
+    session_key = _get_or_create_session_key(request)
     cart_items = list(cart.items.select_related('product', 'color', 'size'))
     if not cart_items:
         messages.error(request, "Your cart is empty.")
@@ -42,7 +65,7 @@ def checkout(request):
         total = cart.total_price()
 
         order = Order.objects.create(
-            user=request.user,
+            user=request.user if request.user.is_authenticated else None,
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -52,6 +75,7 @@ def checkout(request):
             postcode=postcode,
             country=country,
             total=total,
+            guest_session_key=session_key if not request.user.is_authenticated else None,
             status='pending',
         )
 
@@ -92,8 +116,9 @@ def checkout(request):
                 metadata={
                     'order_id': str(order.id),
                     'order_number': order.order_number,
-                    'user_id': str(request.user.id),
+                    'user_id': str(request.user.id) if request.user.is_authenticated else '',
                 },
+                customer_email=email,
                 success_url=success_url,
                 cancel_url=cancel_url,
             )
@@ -114,14 +139,17 @@ def checkout(request):
         return render(request, 'checkout.html', context)
 
 
-@login_required(login_url='login')
 def stripe_checkout_success(request):
     session_id = request.GET.get('session_id')
     if not session_id:
         messages.error(request, "Missing Stripe session.")
         return redirect('checkout')
 
-    order = get_object_or_404(Order, stripe_session_id=session_id, user=request.user)
+    order = get_object_or_404(Order, stripe_session_id=session_id)
+    if not _can_access_order(request, order):
+        messages.error(request, "You are not authorized to view this order.")
+        return redirect('checkout')
+
     if order.status != 'paid' and settings.STRIPE_SECRET_KEY:
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
@@ -142,21 +170,23 @@ def stripe_checkout_success(request):
     return redirect('order_confirmation', order_number=order.order_number)
 
 
-@login_required(login_url='login')
 def stripe_checkout_cancel(request):
     order_number = request.GET.get('order_number')
     if order_number:
-        order = Order.objects.filter(order_number=order_number, user=request.user).first()
-        if order and order.status == 'pending':
+        order = Order.objects.filter(order_number=order_number).first()
+        if order and _can_access_order(request, order) and order.status == 'pending':
             order.status = 'canceled'
             order.save(update_fields=['status'])
     messages.warning(request, "Payment was canceled. Your cart is still intact.")
     return redirect('checkout')
 
 
-@login_required(login_url='login')
 def order_confirmation(request, order_number):
-    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    order = get_object_or_404(Order, order_number=order_number)
+    if not _can_access_order(request, order):
+        messages.error(request, "You are not authorized to view this order.")
+        return redirect('checkout')
+
     invoice = Invoice.objects.filter(order=order).first()
     context = {
         'order': order,
@@ -165,10 +195,18 @@ def order_confirmation(request, order_number):
     return render(request, 'order-confirmation.html', context)
 
 
-@login_required(login_url='login')
 def order_tracking(request):
     query = request.GET.get('q', '').strip()
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    track_order_number = request.GET.get('order_number', '').strip().upper()
+    track_email = request.GET.get('email', '').strip()
+    tracked_order = None
+    tracked_invoice = None
+
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        session_key = _get_or_create_session_key(request)
+        orders = Order.objects.filter(user__isnull=True, guest_session_key=session_key).order_by('-created_at')
 
     if query:
         orders = orders.filter(
@@ -176,8 +214,28 @@ def order_tracking(request):
             Q(status__icontains=query)
         )
 
+    if track_order_number or track_email:
+        if track_order_number and track_email:
+            tracked_order = (
+                Order.objects
+                .filter(order_number__iexact=track_order_number, email__iexact=track_email)
+                .prefetch_related('items__product', 'items__size', 'items__color')
+                .first()
+            )
+            if tracked_order:
+                _mark_order_verified(request, tracked_order.order_number)
+                tracked_invoice = Invoice.objects.filter(order=tracked_order).first()
+            else:
+                messages.error(request, "No order found with that order number and email.")
+        else:
+            messages.error(request, "Enter both order number and email to track an order.")
+
     context = {
         'orders': orders,
         'query': query,
+        'track_order_number': track_order_number,
+        'track_email': track_email,
+        'tracked_order': tracked_order,
+        'tracked_invoice': tracked_invoice,
     }
     return render(request, 'order-tracking.html', context)

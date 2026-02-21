@@ -1,0 +1,150 @@
+PAYMENT AND ORDER FLOW (AUTH + GUEST)
+=====================================
+
+This project now supports both:
+- logged-in checkout
+- guest checkout (no login required)
+
+
+1) CART FLOW
+------------
+
+Routes:
+- GET  /cart/                          -> view cart
+- POST /cart/add/<product_slug>/       -> add item
+- POST /cart/update/                   -> change quantity
+- POST /cart/remove/                   -> remove item
+
+Behavior:
+- Logged-in users use cart linked to `Cart.user`.
+- Guests use cart linked to `Cart.session_key`.
+- Update/remove endpoints validate the item belongs to current cart.
+
+
+2) CHECKOUT FLOW
+----------------
+
+Route:
+- GET|POST /orders/checkout/
+
+GET:
+- Renders checkout form with cart summary.
+- If cart is empty, redirects to `/cart/` with message.
+
+POST:
+1. Validates Stripe key and form data.
+2. Creates `Order` with:
+   - `user=<current user>` if authenticated, else `None`
+   - `guest_session_key=<session key>` for guests
+   - `status='pending'`
+3. Copies `CartItem` rows into `OrderItem` snapshot rows.
+4. Creates Stripe Checkout Session with:
+   - `client_reference_id = order.order_number`
+   - metadata includes `order_id`, `order_number`, and optional `user_id`
+   - `customer_email` from checkout form
+5. Saves `stripe_session_id` and `stripe_payment_intent_id` on order.
+6. Redirects user to Stripe hosted checkout.
+
+Failure:
+- If Stripe session creation fails, pending order is deleted and user is redirected back to checkout.
+
+
+3) AFTER STRIPE REDIRECT
+------------------------
+
+Success route:
+- GET /orders/checkout/success/?session_id=...
+
+Success behavior:
+1. Finds order by `stripe_session_id`.
+2. Access check:
+   - Auth order: current user must own it.
+   - Guest order: browser session key must match `order.guest_session_key`.
+3. If order still pending, it performs Stripe session verification fallback.
+4. If Stripe says paid, it finalizes payment.
+5. Redirects to `/orders/order-confirmation/<order_number>/`.
+
+Cancel route:
+- GET /orders/checkout/cancel/?order_number=...
+
+Cancel behavior:
+- If accessible order is still pending, status becomes `canceled`.
+- Cart is not cleared on cancel.
+- Redirects back to checkout.
+
+
+4) WEBHOOK FLOW
+---------------
+
+Webhook route:
+- POST /stripe/webhook/
+
+Verification:
+- Stripe signature is verified using `STRIPE_WEBHOOK_SECRET`.
+
+Handled events:
+- `checkout.session.completed`
+  - Resolves order by order number/id metadata
+  - Finalizes payment
+- `checkout.session.async_payment_failed`
+- `payment_intent.payment_failed`
+  - Marks order as failed (unless already paid)
+
+
+5) FINALIZATION LOGIC
+---------------------
+
+Shared function:
+- `orders.payment_utils.finalize_order_payment(...)`
+
+What it does:
+1. Sets order status to `paid`.
+2. Sets `paid_at`.
+3. Updates Stripe IDs if provided.
+4. If order has a user:
+   - creates/updates invoice as paid
+   - creates invoice items once
+   - clears user cart
+5. If order is guest:
+   - clears cart by `guest_session_key`
+
+
+6) ORDER ACCESS RULES
+---------------------
+
+Order confirmation route:
+- GET /orders/order-confirmation/<order_number>/
+
+Access policy:
+- Logged-in order: only owner can view.
+- Guest order: only browser with matching session key can view.
+
+Tracking route:
+- GET /orders/tracking/
+
+Behavior:
+- Logged-in user sees all their orders.
+- Guest sees only guest orders from current browser session.
+- Public lookup is also available on this page:
+  - Input `order_number` + `email`
+  - If match exists, system marks that order number as verified in session
+  - User can then open full order confirmation for that order
+  - This supports guests who lost checkout session continuity
+
+
+7) REQUIRED ENV SETTINGS
+------------------------
+
+Set in `.env`:
+- STRIPE_SECRET_KEY
+- STRIPE_PUBLISHABLE_KEY
+- STRIPE_WEBHOOK_SECRET
+- STRIPE_CURRENCY (default `gbp`)
+
+
+8) WHY GUEST CHECKOUT IS SAFE IN THIS FLOW
+------------------------------------------
+
+- Guest order visibility is tied to session key, not public order number alone.
+- Stripe webhook still acts as source-of-truth for payment completion.
+- Success-page Stripe verification fallback handles delayed webhook delivery.

@@ -28,6 +28,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     order_number = models.CharField(max_length=32, unique=True, db_index=True, blank=True, null=True)
+    guest_session_key = models.CharField(max_length=40, blank=True, null=True, db_index=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
     stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True)

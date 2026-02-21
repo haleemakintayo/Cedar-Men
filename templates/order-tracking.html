@@ -14,6 +14,36 @@
 
 <div class="checkout-area ptb-100">
     <div class="container">
+        <h3 class="mb-4">Track Any Order</h3>
+        <form method="get" class="mb-5">
+            <div class="row">
+                <div class="col-md-5 mb-2">
+                    <input type="text" name="order_number" class="form-control" placeholder="Order number (e.g. ORD-...)" value="{{ track_order_number }}">
+                </div>
+                <div class="col-md-5 mb-2">
+                    <input type="email" name="email" class="form-control" placeholder="Checkout email" value="{{ track_email }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button class="btn btn-dark w-100" type="submit">Track</button>
+                </div>
+            </div>
+        </form>
+
+        {% if tracked_order %}
+        <div class="card mb-5">
+            <div class="card-body">
+                <h5 class="mb-3">Tracked Order: {{ tracked_order.order_number }}</h5>
+                <p class="mb-1">Status: <strong>{{ tracked_order.status|title }}</strong></p>
+                <p class="mb-1">Email: <strong>{{ tracked_order.email }}</strong></p>
+                <p class="mb-1">Total: <strong>£{{ tracked_order.total|floatformat:2 }}</strong></p>
+                {% if tracked_invoice %}
+                <p class="mb-3">Invoice: <strong>{{ tracked_invoice.invoice_number }}</strong></p>
+                {% endif %}
+                <a class="btn btn-sm btn-outline-dark" href="{% url 'order_confirmation' tracked_order.order_number %}">View Full Order</a>
+            </div>
+        </div>
+        {% endif %}
+
         <h3 class="mb-4">My Orders</h3>
         <form method="get" class="mb-4">
             <div class="row">

@@ -20,7 +20,7 @@ class ProductForm(forms.ModelForm):
     model = Product
 
     fields = [
-      'name', 'price', 'old_price', 'stock', 'colors', 'image', 
+      'name', 'price', 'old_price', 'stock', 'colors', 'image', 'image2', 'image3', 'image4', 'image5',
       'sizes', 'description', 'more_info', 'composition', 'style', 'properties'
     ]
         
@@ -35,6 +35,10 @@ class ProductForm(forms.ModelForm):
       'style': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter style details'}),
       'properties': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter product properties'}),
       'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),  # Image Upload with Bootstrap styling
+      'image2': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+      'image3': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+      'image4': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+      'image5': forms.ClearableFileInput(attrs={'class': 'form-control'}),
     }
 
 # class ContactForm(forms.Form):
