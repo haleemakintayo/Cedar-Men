@@ -20,22 +20,28 @@
 </div> -->
 
 <div class="slider-area style-res">
-    <div class="container-fluid text-center">
-        <div class="slider-opacity ptb-250" style="background-image: url('{% static 'assets/img/bg/3.jpg' %}'); background-size: cover; background-position: center; transition: background-image 1s ease-in-out;">
-            <div class="slider-text style-1">
+    <div class="container-fluid text-center" style="padding: 0;">
+        <div class="video-container" style="position: relative; overflow: hidden; background-color: #ffffff; width: 100%;">
+            <video autoplay loop muted playsinline class="responsive-video">
+                <source src="{% static 'assets/video/bg-video.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="slider-text style-1" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 100%; padding: 20px;">
                 <h2 data-aos="fade-right"
                     data-aos-duration="1000"
                     data-aos-delay="500"
-                    data-aos-easing="ease-in-out">
+                    data-aos-easing="ease-in-out"
+                    style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
                     CedarMen Collection 2026
                 </h2>
                 <h3 data-aos="fade-left"
                     data-aos-duration="2000"
                     data-aos-delay="300"
-                    data-aos-easing="ease-in-out">
+                    data-aos-easing="ease-in-out"
+                    style="color: #eee; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
                     A good looking, comfortable Urban collection
                 </h3>
-                <a href="#" class="button large color-hover">Shop The Collection</a>
+                <a href="#" class="button large color-hover" style="box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">Shop The Collection</a>
             </div>
         </div>
     </div>
@@ -102,6 +108,37 @@
         width: 100%;
         height: auto;
         object-fit: cover;
+    }
+}
+
+/* Responsive Background Video Settings */
+/* 1. Mobile First - Exact settings you confirmed were perfect */
+.responsive-video {
+    width: 100%;
+    height: auto;
+    max-height: 90vh;
+    display: block;
+    object-fit: contain;
+}
+
+/* 2. iPads and Tablets (Screens 768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .responsive-video {
+        /* On widescreen iPads, make it fill the section nicely */
+        height: 100vh;
+        max-height: none;
+        object-fit: cover; /* 'cover' ensures no white gaps on the left & right sides */
+        object-position: center center;
+    }
+}
+
+/* 3. Laptops and Desktops (Screens 1024px and wider) */
+@media (min-width: 1024px) {
+    .responsive-video {
+        height: 80vh; /* Shorter height so it doesn't overwhelm the screen */
+        object-fit: contain; /* Guarantees the ENTIRE video shows without any cropping */
+        object-position: center center;
+        background-color: #ffffff; /* Subtle black background to blend any widescreen letterboxing */
     }
 }
 </style>
@@ -216,31 +253,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const images = [
-            "{% static 'assets/img/bg/1.jpg' %}",
-            "{% static 'assets/img/bg/3.jpg' %}",
-            "{% static 'assets/img/bg/4.jpg' %}"
-        ];
-        let currentIndex = 0;
-        const sliderElement = document.querySelector('.slider-opacity');
-        
-        // Find the index of the initial image if possible to avoid immediate jump
-        // The initial image is 3.jpg, which is index 1 in our array
-        currentIndex = 1;
-
-        if (sliderElement) {
-            setInterval(() => {
-                currentIndex = (currentIndex + 1) % images.length;
-                // Preload image to prevent flickering
-                const img = new Image();
-                img.src = images[currentIndex];
-                img.onload = () => {
-                    sliderElement.style.backgroundImage = `url('${images[currentIndex]}')`;
-                };
-            }, 5000);
-        }
-    });
-</script>
 {% endblock %}
