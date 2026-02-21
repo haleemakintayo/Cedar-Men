@@ -128,7 +128,7 @@ def add_review(request, product_slug):
 
 
 def blog_details(request, id):
-    blog = Blog.objects.get(id=id)
+    blog = get_object_or_404(Blog, id=id)
     return render(request, 'blog-details.html', {'blog': blog})
 
 def contact_us(request):

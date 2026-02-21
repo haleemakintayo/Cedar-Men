@@ -26,22 +26,23 @@
                 <source src="{% static 'assets/video/bg-video.mp4' %}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
-            <div class="slider-text style-1" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 100%; padding: 20px;">
+            <div class="slider-text style-1" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 100%; padding: 20px; margin-top: -20px;">
                 <h2 data-aos="fade-right"
                     data-aos-duration="1000"
                     data-aos-delay="500"
                     data-aos-easing="ease-in-out"
-                    style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
-                    CedarMen Collection 2026
-                </h2>
-                <h3 data-aos="fade-left"
+                    class="hero-title"
+                    style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);font-size: 40px;">
+                    SS COLLECTION'26
+                </h2><br>
+                <!-- <h3 data-aos="fade-left"
                     data-aos-duration="2000"
                     data-aos-delay="300"
                     data-aos-easing="ease-in-out"
                     style="color: #eee; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
                     A good looking, comfortable Urban collection
-                </h3>
-                <a href="#" class="button large color-hover" style="box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">Shop The Collection</a>
+                </h3> -->
+                <a href="{% url 'shop' %}" style="color: #fff; border: 1px solid #fff; background: transparent; box-shadow: #fff 2px 2px 10px #fff; padding: 12px 30px; display: inline-block; text-decoration: none; font-weight: 600; text-transform: uppercase;">Shop Now</a>
             </div>
         </div>
     </div>
@@ -85,6 +86,17 @@
 
 
 <style>
+/* Responsive Hero Title */
+.hero-title {
+    font-size: 24px; /* Reduced for mobile */
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 38px; /* Original size for laptop/desktop */
+    }
+}
+
 /* Ensure all product cards in a row have the same height on mobile */
 @media (max-width: 576px) {
     .grid.row {
@@ -152,7 +164,7 @@
                         <div class="shop hover-style mb-30">
                             <div class="shop-img-container">
                                 <a href="{{ product.get_url }}">
-                                    {% if product.image %}
+                                    {% if product.image and product.image.name %}
                                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="shop-img"/>
                                     {% else %}
                                     <img src="{% static 'assets/img/product/default.jpg' %}" alt="{{ product.name }}" class="shop-img"/>
@@ -235,7 +247,7 @@
         <div class="col-lg-3 col-md-6 col-sm-6 col-6"> <!-- Add col-6 for extra small screens -->
             <div class="single-blog mb-30">
                 <a href="{% url 'blog' %}">
-                    {% if blog.image %}
+                    {% if blog.image and blog.image.name %}
                     <img src="{{ blog.image.url }}" alt="">
                     {% endif %}
                 </a>

@@ -26,7 +26,9 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="single-blog-page mb-40 text-center">
                                     <a href="{% url 'blog_details' blog.id %}">
+                                        {% if blog.image and blog.image.name %}
                                         <img src="{{ blog.image.url }}" alt="{{ blog.title }}">
+                                        {% endif %}
                                     </a>
                                     <div class="blog-page-title">
                                         <span>{{ blog.publish_date|date:"F d, Y" }}</span>  <!-- Format date -->
