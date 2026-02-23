@@ -5,7 +5,7 @@
             <div class="breadcrumb-area">
                 <div class="container-fluid text-center">
                     <div class="breadcrumb-stye gray-bg ptb-100">
-                        <h2 class="page-title">cart page</h2>
+                        <h2 style="font-size: 15px;" class="page-title">cart page</h2>
                         <ul>
                             <li><a href="{% url 'home' %}">home</a></li>
                             <li><a href="{% url 'shop' %}">shop</a></li>
@@ -74,7 +74,7 @@
                                 <div class="row">
                                     <div class="col-lg-5 ms-auto col-md-12 col-12">
                                         <div class="cart-total">
-                                            <h2>Cart totals</h2>
+                                            <h2 style="font-size: 15px;">cart totals</h2>
                                             <ul>
                                                 <li>Subtotal <span id="cart-subtotal">£ {{ cart.total_price|floatformat:2 }}</span></li>
                                                 <li>Total <span id="cart-total">£ {{ cart.total_price|floatformat:2 }}</span></li>

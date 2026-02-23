@@ -5,7 +5,7 @@
 <div class="breadcrumb-area">
     <div class="container-fluid text-center">
         <div class="breadcrumb-stye gray-bg ptb-100">
-            <h2 style="font-size: 19px;" class="page-title">product details</h2>
+            <h2 style="font-size: 15px;" class="page-title">product details</h2>
             <ul>
                 <li><a href="{% url 'home' %}">home</a></li>
                 <li class="active">{{ product.name }}</li>
@@ -29,17 +29,64 @@
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" />
                         {% endif %}
                     </div>
-                    {# Additional thumbnails can be added here if available #}
+                    {% if product.image2 %}
+                    <div class="pro-large-img tab-pane" id="pro-large-img-2">
+                        <img src="{{ product.image2.url }}" alt="{{ product.name }}" />
+                    </div>
+                    {% endif %}
+                    {% if product.image3 %}
+                    <div class="pro-large-img tab-pane" id="pro-large-img-3">
+                        <img src="{{ product.image3.url }}" alt="{{ product.name }}" />
+                    </div>
+                    {% endif %}
+                    {% if product.image4 %}
+                    <div class="pro-large-img tab-pane" id="pro-large-img-4">
+                        <img src="{{ product.image4.url }}" alt="{{ product.name }}" />
+                    </div>
+                    {% endif %}
+                    {% if product.image5 %}
+                    <div class="pro-large-img tab-pane" id="pro-large-img-5">
+                        <img src="{{ product.image5.url }}" alt="{{ product.name }}" />
+                    </div>
+                    {% endif %}
                 </div>
                 <!-- QuickView Product Thumbnail Slider -->
-                <div class="pro-thumb-img-slider nav">
+                <div class="pro-thumb-img-slider nav flex-row" style="display: flex; gap: 10px; overflow-x: auto; margin-top: 15px;">
                     <div>
-                        <a href="#pro-large-img-1" data-bs-toggle="tab">
+                        <a class="active" href="#pro-large-img-1" data-bs-toggle="tab">
                             {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />
                             {% endif %}
                         </a>
                     </div>
+                    {% if product.image2 %}
+                    <div>
+                        <a href="#pro-large-img-2" data-bs-toggle="tab">
+                            <img src="{{ product.image2.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if product.image3 %}
+                    <div>
+                        <a href="#pro-large-img-3" data-bs-toggle="tab">
+                            <img src="{{ product.image3.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if product.image4 %}
+                    <div>
+                        <a href="#pro-large-img-4" data-bs-toggle="tab">
+                            <img src="{{ product.image4.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if product.image5 %}
+                    <div>
+                        <a href="#pro-large-img-5" data-bs-toggle="tab">
+                            <img src="{{ product.image5.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" />
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             <!-- QuickView Product Details -->

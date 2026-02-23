@@ -32,7 +32,7 @@
                     data-aos-delay="500"
                     data-aos-easing="ease-in-out"
                     class="hero-title"
-                    style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);font-size: 40px;">
+                    style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);font-size: 34px;font-family: 'Arial Black', Impact, sans-serif; font-weight: 900; letter-spacing: 2px;">
                     SS COLLECTION'26
                 </h2><br>
                 <!-- <h3 data-aos="fade-left"
@@ -163,7 +163,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-6 grid-item cat1">
                         <div class="shop hover-style mb-30">
                             <div class="shop-img-container">
-                                <a href="{{ product.get_url }}">
+                                <a  href="{{ product.get_url }}">
                                     {% if product.image and product.image.name %}
                                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="shop-img"/>
                                     {% else %}
@@ -172,7 +172,7 @@
                                 </a>    
                             </div>
                             <div class="shop-title title-style-1">
-                                <h3><a href="{{ product.get_url }}">{{ product.name }}</a></h3>
+                                <h3 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 17px;"><a style="text-transform: none !important; font-weight: normal; color: inherit; display: block;" href="{{ product.get_url }}">{{ product.name }}</a></h3>
                                 <span class="new-price">£{{ product.price }}</span>
                                 <span class="old-price">£{{ product.old_price }}</span>
                             </div>
