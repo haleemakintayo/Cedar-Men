@@ -11,6 +11,16 @@ class Order(models.Model):
         ('failed', 'Failed'),
         ('canceled', 'Canceled'),
     ]
+    
+    SHIPPING_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('label_generated', 'Label Generated'),
+        ('manifested', 'Manifested'),
+        ('in_transit', 'In Transit'),
+        ('delivered', 'Delivered'),
+        ('failed', 'Failed'),
+    ]
+    
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -33,6 +43,43 @@ class Order(models.Model):
     stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
     stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True)
     paid_at = models.DateTimeField(blank=True, null=True)
+    
+    # Royal Mail Click & Drop Shipping Fields
+    shipping_reference = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        db_index=True,
+        help_text="Unique reference returned by Royal Mail API"
+    )
+    label_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="URL to the generated shipping label"
+    )
+    label_file = models.FileField(
+        upload_to='shipping_labels/%Y/%m/%d/',
+        blank=True,
+        null=True,
+        help_text="Stored PDF label from Royal Mail"
+    )
+    shipping_status = models.CharField(
+        max_length=20,
+        choices=SHIPPING_STATUS_CHOICES,
+        default='pending',
+        db_index=True,
+        help_text="Current shipping status from Royal Mail"
+    )
+    shipping_created_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="When the shipping label was created"
+    )
+    shipping_error_message = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Error details if shipping creation failed"
+    )
 
     @classmethod
     def generate_order_number(cls):
@@ -42,6 +89,15 @@ class Order(models.Model):
             order_number = f"ORD-{date_part}-{token}"
             if not cls.objects.filter(order_number=order_number).exists():
                 return order_number
+
+    def get_total_weight_grams(self):
+        """Calculate total weight of order items in grams.
+        Defaults to 500g per item if product weight not available."""
+        total_weight = 0
+        for item in self.items.all():
+            product_weight = getattr(item.product, 'weight_grams', 500)
+            total_weight += product_weight * item.quantity
+        return total_weight or 500  # Default to 500g if empty
 
     def __str__(self):
         return self.order_number or f"Order {self.id}"
