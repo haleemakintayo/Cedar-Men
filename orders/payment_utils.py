@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils import timezone
 
 from cart.models import Cart
@@ -26,6 +27,21 @@ def finalize_order_payment(order, stripe_session_id=None, stripe_payment_intent_
 
     if update_fields:
         order.save(update_fields=update_fields)
+
+    # =============================================
+    # Trigger Royal Mail async shipping task
+    # =============================================
+    # Only trigger if Royal Mail is configured
+    if settings.ROYAL_MAIL_API_URL and settings.ROYAL_MAIL_API_KEY:
+        try:
+            from orders.tasks import create_royal_mail_shipment
+            # Use delay() for async execution (non-blocking)
+            create_royal_mail_shipment.delay(order.id)
+        except Exception as e:
+            # Log but don't fail the payment process
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to queue Royal Mail task for order {order.order_number}: {e}")
 
     if order.user:
         invoice, _ = Invoice.objects.get_or_create(

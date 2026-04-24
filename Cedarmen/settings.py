@@ -189,3 +189,44 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 STRIPE_CURRENCY = os.getenv('STRIPE_CURRENCY', 'gbp')
+
+# =============================================
+# Royal Mail Click & Drop API Configuration
+# =============================================
+ROYAL_MAIL_API_URL = os.getenv('ROYAL_MAIL_API_URL', '')
+ROYAL_MAIL_API_KEY = os.getenv('ROYAL_MAIL_API_KEY', '')
+ROYAL_MAIL_REQUEST_TIMEOUT = int(os.getenv('ROYAL_MAIL_REQUEST_TIMEOUT', '30'))
+
+# =============================================
+# Celery Configuration with Redis Broker
+# =============================================
+# Redis is already installed (redis==6.4.0 in requirements.txt)
+
+# Celery broker and result backend
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/1')
+
+# Celery task settings
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+
+# Task execution settings
+CELERY_TASK_ACKS_LATE = True  # Acknowledge task after execution
+CELERY_TASK_REJECT_ON_WORKER_LOST = True  # Requeue if worker dies
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Prevent worker from grabbing too many tasks
+
+# Task result expiration (7 days)
+CELERY_RESULT_EXPIRES = 60 * 60 * 24 * 7
+
+# Task routes for priority handling
+CELERY_TASK_ROUTES = {
+    'orders.tasks.create_royal_mail_shipment': {'queue': 'shipping'},
+    'orders.tasks.retry_failed_shipment': {'queue': 'shipping'},
+    'orders.tasks.cleanup_old_shipping_orders': {'queue': 'main'},
+}
+
+# Beat schedule for periodic tasks
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
