@@ -50,6 +50,15 @@ class Size(models.Model):
         return self.label        
 
 class Product(models.Model):
+    TAX_CHOICES = [
+        ('standard', 'Standard (20%)'),
+        ('zero', 'Zero (0%)'),
+    ]
+    SHIPPING_FORMAT_CHOICES = [
+        ('large_letter', 'Large Letter'),
+        ('small_parcel', 'Small Parcel'),
+        ('medium_parcel', 'Medium Parcel'),
+    ]
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -70,6 +79,9 @@ class Product(models.Model):
     style = models.CharField(max_length=255, blank=True, null=True)
     properties = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
+    product_weight = models.PositiveIntegerField(default=500, help_text="Weight in grams for shipping calculations")
+    tax_class = models.CharField(max_length=20, choices=TAX_CHOICES, default='standard')
+    shipping_format = models.CharField(max_length=20, choices=SHIPPING_FORMAT_CHOICES, default='small_parcel')
 
     def save(self, *args, **kwargs):
         if not self.slug:

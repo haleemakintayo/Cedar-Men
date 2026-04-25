@@ -26,6 +26,27 @@ class Cart(models.Model):
     
     def total_price(self):
         return sum(item.subtotal() for item in self.items.all())
+    
+    def total_weight(self):
+        """Calculate total weight of all items in cart in grams."""
+        return sum(item.total_weight() for item in self.items.all())
+    
+    def total_weight_kg(self):
+        """Return total weight in kilograms."""
+        return self.total_weight() / 1000
+    
+    def get_shipping_weight_category(self):
+        """Get shipping weight category for Royal Mail.
+        Returns: 'small' (<1kg), 'medium' (1-2kg), 'large' (2-5kg), 'xlarge' (>5kg)"""
+        weight_kg = self.total_weight_kg()
+        if weight_kg < 1:
+            return 'small'
+        elif weight_kg < 2:
+            return 'medium'
+        elif weight_kg < 5:
+            return 'large'
+        else:
+            return 'xlarge'
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -39,3 +60,16 @@ class CartItem(models.Model):
     
     def subtotal(self):
         return self.product.price * self.quantity
+    
+    def weight(self):
+        """Get weight of this cart item in grams.
+        Uses product's product_weight field (default 500g)."""
+        return getattr(self.product, 'product_weight', 500)
+    
+    def total_weight(self):
+        """Get total weight of this cart item (weight × quantity) in grams."""
+        return self.weight() * self.quantity
+    
+    def total_weight_kg(self):
+        """Get total weight in kilograms."""
+        return self.total_weight() / 1000

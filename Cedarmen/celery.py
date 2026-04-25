@@ -27,7 +27,6 @@ def debug_task(self):
 
 # Celery Beat Schedule for periodic tasks
 app.conf.beat_schedule = {
-    # Example: Clean up old pending shipping orders daily
     'cleanup-old-shipping-orders': {
         'task': 'orders.tasks.cleanup_old_shipping_orders',
         'schedule': crontab(hour=2, minute=0),  # Run at 2:00 AM daily

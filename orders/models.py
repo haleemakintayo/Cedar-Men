@@ -95,9 +95,14 @@ class Order(models.Model):
         Defaults to 500g per item if product weight not available."""
         total_weight = 0
         for item in self.items.all():
-            product_weight = getattr(item.product, 'weight_grams', 500)
+            # Use product_weight field from Product model (default 500g)
+            product_weight = getattr(item.product, 'product_weight', 500)
             total_weight += product_weight * item.quantity
         return total_weight or 500  # Default to 500g if empty
+    
+    def get_total_weight_kg(self):
+        """Return total weight in kilograms."""
+        return self.get_total_weight_grams() / 1000
 
     def __str__(self):
         return self.order_number or f"Order {self.id}"

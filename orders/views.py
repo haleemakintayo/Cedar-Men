@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal, ROUND_HALF_UP
 
 import stripe
@@ -5,11 +6,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from orders.models import Order, OrderItem
 from orders.payment_utils import finalize_order_payment
-from cart.utils import get_cart
+from cart.utils import get_cart, calculate_cart_totals
 from ecommerce.models import Invoice
+from .forms import CheckoutForm
 
 def _to_stripe_amount(amount: Decimal) -> int:
     return int((amount * Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
@@ -133,8 +137,12 @@ def checkout(request):
 
         return redirect(session.url)
     else:
+        form = CheckoutForm()
+        totals = calculate_cart_totals(cart, 'GB')
         context = {
             'cart': cart,
+            'form': form,
+            'totals': totals,
         }
         return render(request, 'checkout.html', context)
 
@@ -239,3 +247,24 @@ def order_tracking(request):
         'tracked_invoice': tracked_invoice,
     }
     return render(request, 'order-tracking.html', context)
+
+
+@csrf_exempt
+def calculate_checkout_totals_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            country_code = data.get('country_code', 'GB')
+        except json.JSONDecodeError:
+            country_code = 'GB'
+            
+        cart = get_cart(request)
+        totals = calculate_cart_totals(cart, country_code)
+        
+        return JsonResponse({
+            'subtotal': f"£{totals['subtotal']}",
+            'tax': f"£{totals['tax']}",
+            'shipping': f"£{totals['shipping']}",
+            'total': f"£{totals['total']}",
+        })
+    return JsonResponse({'error': 'Invalid request'}, status=400)

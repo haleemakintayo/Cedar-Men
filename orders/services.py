@@ -7,11 +7,54 @@ import logging
 from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.utils import timezone
 import requests
 from requests.exceptions import RequestException, Timeout, ConnectionError
 
+from orders.models import Order
+
 logger = logging.getLogger(__name__)
+
+
+# Country name to ISO code mapping
+COUNTRY_CODE_MAP = {
+    'united kingdom': 'GB',
+    'great britain': 'GB',
+    'england': 'GB',
+    'scotland': 'GB',
+    'wales': 'GB',
+    'northern ireland': 'GB',
+    'united states': 'US',
+    'united states of america': 'US',
+    'usa': 'US',
+    'france': 'FR',
+    'germany': 'DE',
+    'spain': 'ES',
+    'italy': 'IT',
+    'netherlands': 'NL',
+    'belgium': 'BE',
+    'ireland': 'IE',
+    'portugal': 'PT',
+    'austria': 'AT',
+    'switzerland': 'CH',
+    'canada': 'CA',
+    'australia': 'AU',
+    'new zealand': 'NZ',
+    'japan': 'JP',
+    'china': 'CN',
+    'india': 'IN',
+    'brazil': 'BR',
+    'south africa': 'ZA',
+}
+
+# Package format identifiers
+PACKAGE_FORMATS = {
+    'small': 'smallParcel',      # < 1kg, small items
+    'medium': 'mediumParcel',    # 1-2kg, medium items
+    'large': 'largeParcel',      # 2-5kg, large items
+    'xlarge': 'xlargeParcel',    # > 5kg, heavy items
+}
 
 
 class RoyalMailServiceException(Exception):
@@ -146,10 +189,124 @@ class RoyalMailService:
             logger.error(f"Request error with Royal Mail API: {str(e)}")
             raise RoyalMailServiceException(f"Request error: {str(e)}")
     
+    def _get_country_code(self, country_name):
+        """
+        Convert country name to ISO 2-letter country code.
+        
+        Args:
+            country_name: str - Country name (e.g., "United Kingdom", "GB")
+            
+        Returns:
+            str: ISO country code (e.g., "GB")
+        """
+        if not country_name:
+            return "GB"  # Default to UK
+        
+        # Check if already a valid 2-letter code
+        if len(country_name) == 2:
+            return country_name.upper()
+        
+        # Try to find in mapping
+        normalized = country_name.lower().strip()
+        if normalized in COUNTRY_CODE_MAP:
+            return COUNTRY_CODE_MAP[normalized]
+        
+        # Log warning and default to GB
+        logger.warning(f"Unknown country '{country_name}', defaulting to GB")
+        return "GB"
+    
+    def _smart_split_address(self, address):
+        """
+        Intelligently split a long address across line1 and line2.
+        Avoids cutting words in half - tries to split at logical breakpoints.
+        
+        Args:
+            address: str - Full address string
+            
+        Returns:
+            tuple: (line1, line2) - Split address lines
+        """
+        max_line_length = 35
+        
+        if not address:
+            return ("", "")
+        
+        address = address.strip()
+        
+        # If short enough, no splitting needed
+        if len(address) <= max_line_length:
+            return (address, "")
+        
+        # Try to split at logical breakpoints
+        split_points = [
+            ', ',    # After comma
+            '; ',    # After semicolon
+            ' - ',   # After hyphen
+            ' -',    # Before hyphen
+            ' and ', # After "and"
+        ]
+        
+        for split_char in split_points:
+            if split_char in address:
+                parts = address.split(split_char)
+                line1 = parts[0].strip()
+                line2 = split_char.join(parts[1:]).strip()
+                
+                # If first part is reasonable, use it
+                if len(line1) <= max_line_length and len(line1) > 0:
+                    # Truncate only if still too long
+                    if len(line1) > max_line_length:
+                        line1 = line1[:max_line_length].strip()
+                    return (line1, line2[:35] if line2 else "")
+        
+        # Fallback: split at word boundary closest to middle
+        words = address.split()
+        line1_parts = []
+        line2_parts = []
+        
+        for word in words:
+            test_line1 = ' '.join(line1_parts)
+            if len(test_line1) + len(word) + 1 <= max_line_length:
+                line1_parts.append(word)
+            else:
+                line2_parts.append(word)
+        
+        line1 = ' '.join(line1_parts)
+        line2 = ' '.join(line2_parts)
+        
+        # Last resort: hard truncate
+        if len(line1) > max_line_length:
+            line1 = line1[:max_line_length].strip()
+        if len(line2) > max_line_length:
+            line2 = line2[:max_line_length].strip()
+        
+        return (line1, line2)
+    
+    def _get_package_format(self, order):
+        """
+        Determine package format based on order weight.
+        
+        Args:
+            order: Order model instance
+            
+        Returns:
+            str: Package format identifier for Royal Mail
+        """
+        weight_kg = order.get_total_weight_kg()
+        
+        if weight_kg < 1:
+            return "smallParcel"
+        elif weight_kg < 2:
+            return "mediumParcel"
+        elif weight_kg < 5:
+            return "largeParcel"
+        else:
+            return "xlargeParcel"
+    
     def _build_shipment_payload(self, order):
         """
         Build the shipment payload for Royal Mail API.
-        Ensures all fields meet Royal Mail's strict character limits and formatting.
+        Ensures all fields meet Royal Mail's strict schema requirements.
         
         Args:
             order: Order model instance
@@ -157,14 +314,28 @@ class RoyalMailService:
         Returns:
             dict: Validated payload for Royal Mail API
         """
-        # Royal Mail has strict address line character limits
-        # Line 1: max 35 chars, Line 2: max 35 chars, Line 3: max 30 chars
-        address_line_1 = self._truncate_string(order.address, 35)
-        address_line_2 = self._truncate_string(order.city, 35)
-        address_line_3 = self._truncate_string(f"{order.state} {order.postcode}", 30)
+        # Smart address splitting (Issue #2 fix)
+        address_line_1, address_line_2 = self._smart_split_address(order.address)
+        
+        # City goes to line2 if we have space, otherwise line3
+        city = self._truncate_string(order.city, 35)
+        state_postcode = self._truncate_string(f"{order.state} {order.postcode}", 30)
+        
+        # Combine city with state/postcode if line2 is empty
+        if not address_line_2 and city:
+            address_line_2 = city
+        elif address_line_2 and city:
+            # Append city to line3 if line2 is used
+            state_postcode = f"{city}, {state_postcode}"[:30]
         
         # Weight must be an integer in grams
         weight_grams = int(order.get_total_weight_grams())
+        
+        # Get country code (Issue #1 fix)
+        country_code = self._get_country_code(order.country)
+        
+        # Get package format (Issue #3 fix)
+        package_format = self._get_package_format(order)
         
         payload = {
             "recipient": {
@@ -172,18 +343,24 @@ class RoyalMailService:
                 "address": {
                     "line1": address_line_1,
                     "line2": address_line_2,
-                    "line3": address_line_3,
+                    "line3": state_postcode,
                     "postcode": self._truncate_string(order.postcode, 8),
-                    "country": order.country,
+                    "countryCode": country_code,  # Use ISO code, not country name
                 }
             },
             "weight": {
                 "value": weight_grams,
                 "unit": "grams"
             },
+            "packageFormatIdentifier": package_format,  # Add package format
             "reference": order.order_number,
             "serviceCode": self._get_service_code(order),
         }
+        
+        logger.info(
+            f"Built payload for order {order.order_number}: "
+            f"weight={weight_grams}g, country={country_code}, format={package_format}"
+        )
         
         return payload
     
@@ -203,24 +380,29 @@ class RoyalMailService:
     @staticmethod
     def _get_service_code(order):
         """
-        Determine Royal Mail service code based on order.
-        Can be enhanced with order attributes like weight, urgency, etc.
+        Determine Royal Mail service code based on order weight.
+        Uses product_weight field from Product model for calculations.
         
         Args:
             order: Order model instance
             
         Returns:
-            str: Royal Mail service code (e.g., 'ST1D', 'ST2D', 'RM1', etc.)
+            str: Royal Mail service code based on weight category
         """
-        # Default to Royal Mail Special Delivery Guaranteed by 1pm (ST1D)
-        # Customize based on your business requirements
         weight_grams = order.get_total_weight_grams()
         
+        # Royal Mail service codes based on weight
+        # Adjust these codes to match your Royal Mail account services
         if weight_grams > 20000:  # > 20kg
-            # Requires different service - adjust as needed
-            return "SR"  # Special Rate
-        
-        return "ST1D"  # Default: Special Delivery 1st Class
+            return "SR"  # Special Rate - for heavy items
+        elif weight_grams > 5000:  # > 5kg
+            return "TDP"  # Tracked Day Priority
+        elif weight_grams > 2000:  # > 2kg
+            return "TDN"  # Tracked Day/Night
+        elif weight_grams > 1000:  # > 1kg
+            return "TRN"  # Tracked Returns
+        else:
+            return "ST1D"  # Special Delivery 1st Class (≤1kg)
     
     def decode_and_save_label(self, order, label_base64):
         """
@@ -255,9 +437,11 @@ class RoyalMailService:
             logger.error(f"Failed to decode/save label for order {order.order_number}: {str(e)}")
             raise RoyalMailServiceException(f"Failed to process label: {str(e)}")
     
+    @transaction.atomic
     def update_order_shipping(self, order, shipping_reference, label_base64):
         """
         Update order with shipping details after successful API call.
+        Uses database transaction to ensure data consistency.
         
         Args:
             order: Order model instance
@@ -267,21 +451,25 @@ class RoyalMailService:
         Raises:
             RoyalMailServiceException: If update fails
         """
+        # Use select_for_update to prevent race conditions
+        order_lock = Order.objects.select_for_update().get(pk=order.pk)
+        
         try:
-            # Decode and save label
-            label_url = self.decode_and_save_label(order, label_base64)
+            # Decode and save label first
+            label_url = self.decode_and_save_label(order_lock, label_base64)
             
-            # Update order fields
-            order.shipping_reference = shipping_reference
-            order.label_url = label_url
-            order.shipping_status = 'label_generated'
-            order.shipping_created_at = timezone.now()
-            order.shipping_error_message = None
-            order.save()
+            # Update order fields within the same transaction
+            order_lock.shipping_reference = shipping_reference
+            order_lock.label_url = label_url
+            order_lock.shipping_status = 'label_generated'
+            order_lock.shipping_created_at = timezone.now()
+            order_lock.shipping_error_message = None
+            order_lock.save()
             
-            logger.info(f"Order {order.order_number} updated with shipping details")
+            logger.info(f"Order {order_lock.order_number} updated with shipping details")
             
         except Exception as e:
+            # If database fails, we want to know about it
             logger.error(f"Failed to update order shipping: {str(e)}")
             raise RoyalMailServiceException(f"Failed to update order: {str(e)}")
     

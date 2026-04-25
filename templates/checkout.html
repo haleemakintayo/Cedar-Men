@@ -1,134 +1,87 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
-            <!-- breadcrumb start -->
-            <div class="breadcrumb-area">
-                <div class="container-fluid text-center">
-                    <div class="breadcrumb-stye gray-bg ptb-100">
-                        <h2 style="font-size: 15px;" class="page-title">checkout page</h2>
-                        <ul>
-                            <li><a href="#">home</a></li>
-                            <li><a href="#">shop</a></li>
-                            <li class="active">checkout</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- breadcrumb end -->
-            <!-- checkout-area start -->
-            <div class="checkout-area ptb-100">
-                <div class="container-fluid">
-                    <form action="{% url 'checkout' %}" method="post">
+<div class="container my-5">
+    <h2 class="mb-4">Checkout</h2>
+    <div class="row">
+        <!-- Left Side: Checkout Form -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Billing & Shipping Details</h4>
+                    <form method="POST" action="{% url 'checkout' %}">
                         {% csrf_token %}
                         <div class="row">
-                            <div class="col-xl-6 col-lg-6">
-                                <div class="checkbox-form">
-                                    <h3 style="font-size: 15px;text-transform: none !important; font-weight: normal; color: inherit; display: block;" >Billing Details</h3>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="checkout-form-list">
-                                                <label>First Name <span class="required">*</span></label>
-                                                <input type="text" name="first_name" placeholder="" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="checkout-form-list">
-                                                <label>Last Name <span class="required">*</span></label>
-                                                <input type="text" name="last_name" placeholder="" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="checkout-form-list">
-                                                <label>Email Address <span class="required">*</span></label>
-                                                <input type="email" name="email" placeholder="" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="checkout-form-list">
-                                                <label>Address <span class="required">*</span></label>
-                                                <input type="text" name="address" placeholder="Street address" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="checkout-form-list">
-                                                <label>Town / City <span class="required">*</span></label>
-                                                <input type="text" name="city" placeholder="Town / City" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="checkout-form-list">
-                                                <label>State / County <span class="required">*</span></label>
-                                                <input type="text" name="state" placeholder="" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="checkout-form-list">
-                                                <label>Postcode / Zip <span class="required">*</span></label>
-                                                <input type="text" name="postcode" placeholder="Postcode / Zip" required/>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="checkout-form-list">
-                                                <label>Country <span class="required">*</span></label>
-                                                <select name="country" required>
-                                                    <option value="Bangladesh">Bangladesh</option>
-                                                    <option value="Algeria">Algeria</option>
-                                                    <option value="Afghanistan">Afghanistan</option>
-                                                    <option value="Ghana">Ghana</option>
-                                                    <!-- Add other countries as needed -->
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Your order summary on the right -->
-                            <div class="col-xl-6 col-lg-6">
-                                <div class="your-order">
-                                    <h3>Your order</h3>
-                                    <div class="your-order-table table-responsive">
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th class="product-name">Product</th>
-                                                    <th class="product-total">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for item in cart.items.all %}
-                                                <tr class="cart_item">
-                                                    <td class="product-name">
-                                                        {{ item.product.name }} <strong class="product-quantity"> x {{ item.quantity }}</strong>
-                                                    </td>
-                                                    <td class="product-total">
-                                                        <span class="amount">£{{ item.subtotal|floatformat:2 }}</span>
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                            <tfoot>
-                                                <tr class="cart-subtotal">
-                                                    <th>Cart Subtotal</th>
-                                                    <td><span class="amount">£{{ cart.total_price|floatformat:2 }}</span></td>
-                                                </tr>
-                                                <tr class="order-total">
-                                                    <th>Order Total</th>
-                                                    <td><strong><span class="amount">£{{ cart.total_price|floatformat:2 }}</span></strong></td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                    <div class="order-button-payment">
-                                        <p class="mb-3">You will be redirected to Stripe to complete payment securely.</p>
-                                        <input type="submit" value="Pay with card" />
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="col-md-6 mb-3">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+                            <div class="col-md-6 mb-3">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
                         </div>
+                        <div class="mb-3">{{ form.address.label_tag }} {{ form.address }}</div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form.city.label_tag }} {{ form.city }}</div>
+                            <div class="col-md-6 mb-3">{{ form.state.label_tag }} {{ form.state }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">{{ form.postcode.label_tag }} {{ form.postcode }}</div>
+                            <div class="col-md-6 mb-3">{{ form.country.label_tag }} {{ form.country }}</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Proceed to Payment</button>
                     </form>
                 </div>
             </div>
-            <!-- checkout-area end -->
-            
-            <!-- checkout-area end -->	
-{% endblock %}            
+        </div>
+
+        <!-- Right Side: Order Summary -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Order Summary</h4>
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for item in cart.items.all %}
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0">{{ item.product.name }}</h6>
+                                <small class="text-muted">Qty: {{ item.quantity }}</small>
+                            </div>
+                            <span class="text-muted">£{{ item.subtotal }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span> <strong id="summary-subtotal">£{{ totals.subtotal }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax</span> <strong id="summary-tax">£{{ totals.tax }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span> <strong id="summary-shipping">£{{ totals.shipping }}</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Total</strong></span> <strong id="summary-total" class="fs-5">£{{ totals.total }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_country').addEventListener('change', function() {
+    const countryCode = this.value;
+    fetch("{% url 'calculate_checkout_totals_api' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ country_code: countryCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.error) return;
+        document.getElementById('summary-subtotal').innerText = data.subtotal;
+        document.getElementById('summary-tax').innerText = data.tax;
+        document.getElementById('summary-shipping').innerText = data.shipping;
+        document.getElementById('summary-total').innerText = data.total;
+    });
+});
+</script>
+{% endblock %}
